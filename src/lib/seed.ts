@@ -3,6 +3,7 @@
  * Wipes and reseeds the database with realistic demo data for all 4 roles.
  * Fictional data only. Money in paise (INR minor units, 100 paise = Re. 1).
  */
+import { buildSmartPlan } from "@/lib/learning";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { MATH_TOPICS, SCIENCE_TOPICS, ENGLISH_TOPICS } from "./curriculum-topics";
@@ -274,8 +275,12 @@ function paperMathHalfYearly() {
 }
 
 /* ---------- MAIN SEED ---------- */
-export async function seedDemoData() {
+export async function generateDemoData() {
   /* wipe (order matters for relations) */
+  await db.flashcard.deleteMany();
+  await db.flashDeck.deleteMany();
+  await db.focusSession.deleteMany();
+  await db.studyPlan.deleteMany();
   await db.message.deleteMany();
   await db.messageThread.deleteMany();
   await db.notification.deleteMany();
@@ -1128,5 +1133,99 @@ export async function seedDemoData() {
     await db.auditEvent.create({ data: { actorName, actorRole, action, resource, detail, severity } });
   }
 
+  await seedLearningToolkit();
+
   return { ok: true, seeded: true };
+}
+
+/* ===== v2 learning toolkit: flashcards, focus sessions, revision plan ===== */
+async function seedLearningToolkit() {
+  const SID = "u-student-aarav";
+  const decks: { title: string; subject: string; topic: string; color: string; cards: [string, string, string][] }[] = [
+    {
+      title: "Light: Reflection & Refraction",
+      subject: "Science",
+      topic: "Light: Reflection",
+      color: "#F47B20",
+      cards: [
+        ["State the two laws of reflection.", "1) Angle of incidence = angle of reflection. 2) Incident ray, reflected ray and normal lie in the same plane.", "Angles + plane"],
+        ["What is refraction?", "The bending of light as it passes from one medium to another because its speed changes.", "Think: straw in water"],
+        ["Mirror formula?", "1/f = 1/v + 1/u (with sign convention).", "f, v, u"],
+        ["What kind of image does a plane mirror form?", "Virtual, erect, laterally inverted and the same size as the object, as far behind the mirror as the object is in front.", "Same size"],
+        ["Define refractive index.", "n = speed of light in vacuum / speed of light in the medium (n = c / v).", "c over v"],
+        ["Why does a pencil look bent in a glass of water?", "Light from the submerged part refracts away from the normal as it leaves water, so the pencil appears raised and bent.", "Refraction at surface"],
+        ["Which mirror is used in vehicle rear-view mirrors and why?", "Convex mirror — it always forms an erect, diminished image and gives a wider field of view.", "Wider view"],
+        ["What is total internal reflection?", "When light travels from denser to rarer medium at an angle greater than the critical angle, it is completely reflected back.", "Critical angle"],
+      ],
+    },
+    {
+      title: "Factorisation essentials",
+      subject: "Mathematics",
+      topic: "Factorisation",
+      color: "#315BE5",
+      cards: [
+        ["Factorise a² − b².", "(a + b)(a − b)", "Difference of squares"],
+        ["Factorise x² + 5x + 6.", "(x + 2)(x + 3) — two numbers that add to 5 and multiply to 6.", "Sum 5, product 6"],
+        ["Factorise 6xy + 9x.", "3x(2y + 3)", "Take out the HCF"],
+        ["Expand (a + b)².", "a² + 2ab + b²", "Square, twice product, square"],
+        ["Factorise x² − 7x + 12.", "(x − 3)(x − 4)", "Both negative"],
+        ["Factorise 4x² − 25.", "(2x + 5)(2x − 5)", "(2x)² − 5²"],
+      ],
+    },
+  ];
+  for (const [i, d] of decks.entries()) {
+    const deck = await db.flashDeck.create({
+      data: { ownerId: SID, title: d.title, subject: d.subject, topic: d.topic, color: d.color, source: "curriculum", createdAt: daysFromNow(-6 + i, 18, 0) },
+    });
+    await db.flashcard.createMany({
+      data: d.cards.map(([front, back, hint], k) => {
+        const reviewed = k % 3 !== 2; // a mix of reviewed and brand-new cards
+        return {
+          deckId: deck.id,
+          front,
+          back,
+          hint,
+          reps: reviewed ? 1 + (k % 2) : 0,
+          interval: reviewed ? (k % 2 ? 6 : 1) : 0,
+          ease: 2.5,
+          dueAt: reviewed && k % 4 === 0 ? daysFromNow(2, 9, 0) : daysFromNow(-1, 9, 0),
+          lastReviewedAt: reviewed ? daysFromNow(-2, 19, 0) : null,
+        };
+      }),
+    });
+  }
+
+  /* ~10 weeks of focus history with a live streak */
+  const subjects = ["Mathematics", "Science", "English", "Mathematics", "Science"];
+  const focus: { userId: string; minutes: number; label: string; subject: string; createdAt: Date }[] = [];
+  for (let d = 70; d >= 1; d--) {
+    const skip = d > 6 && (d * 7) % 5 === 0;
+    if (skip) continue;
+    const blocks = 1 + ((d * 3) % 3);
+    for (let b = 0; b < blocks; b++) {
+      const subject = subjects[(d + b) % subjects.length];
+      focus.push({ userId: SID, minutes: [25, 25, 50, 15, 25][(d + b) % 5], label: `${subject} practice`, subject, createdAt: daysFromNow(-d, 17 + b, 10) });
+    }
+  }
+  await db.focusSession.createMany({ data: focus });
+
+  /* a revision plan for the half-yearly exams, first few days ticked off */
+
+  const examDate = daysFromNow(24, 9, 0);
+  const start = daysFromNow(-3, 0, 0);
+  const days = buildSmartPlan({
+    examDate,
+    start,
+    hoursPerDay: 2,
+    weakTopics: ["Light: Reflection", "Factorisation"],
+    subjects: [
+      { name: "Mathematics", topics: ["Factorisation", "Linear Equations", "Comparing Quantities", "Mensuration", "Exponents & Powers", "Data Handling"] },
+      { name: "Science", topics: ["Light: Reflection", "Sound", "Force & Pressure", "Friction", "Chemical Effects of Current"] },
+      { name: "English", topics: ["Grammar: Reported Speech", "Letter Writing", "Comprehension"] },
+    ],
+  });
+  for (const day of days.slice(0, 3)) for (const t of day.tasks) t.done = true;
+  await db.studyPlan.create({
+    data: { userId: SID, examName: "Half-yearly examinations", examDate, hoursPerDay: 2, plan: JSON.stringify(days), source: "smart", createdAt: start },
+  });
 }

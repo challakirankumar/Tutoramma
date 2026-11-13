@@ -22,12 +22,25 @@ export default function Page() {
       } catch {}
     }
 
+    // installable app: register the service worker in production
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+
     // auth boot
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((json) => {
         if (json?.data) {
           setUser(json.data as AuthUser);
+          /* PWA shortcuts deep-link into a view (?view=s-focus) */
+          const deepView = new URLSearchParams(window.location.search).get("view");
+          if (deepView && /^[a-z]-[a-z-]+$/.test(deepView) && deepView[0] === (json.data as AuthUser).role[0]) {
+            useAppStore.getState().setView(deepView);
+            try {
+              window.history.replaceState(null, "", window.location.pathname);
+            } catch {}
+          }
           /* a signed-in user opening a class link joins the classroom directly */
           const joinSlug = new URLSearchParams(window.location.search).get("join");
           if (joinSlug) {

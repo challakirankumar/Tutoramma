@@ -107,7 +107,7 @@ export function PChildren() {
   if (data.children.length === 0) {
     return (
       <div className="space-y-5">
-        <PageHeader />
+        <PageHeader onBook={() => setView("p-find")} />
         <div className="sk-card p-6">
           <EmptyState
             icon={GraduationCap}

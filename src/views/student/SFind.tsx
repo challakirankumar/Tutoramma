@@ -61,7 +61,7 @@ interface Offering {
   subject: string;
   price: number;
 }
-interface TutorProfile extends TutorCard {
+interface TutorProfile extends Omit<TutorCard, "reviews"> {
   bio: string;
   qualifications: { title: string; issuer: string; year: number; status: string }[];
   experience: { role: string; org: string; from: string; to: string; verified: boolean }[];

@@ -298,7 +298,7 @@ export function PMessages() {
                       className="sk-pill sk-pill-blue shrink-0"
                       title="You're viewing this thread because message visibility is on for your family"
                     >
-                      <Eye className="w-3 h-3" /> Viewing {selected.viewingChildName.split(" ")[0]}'s conversation
+                      <Eye className="w-3 h-3" /> Viewing {selected.viewingChildName?.split(" ")[0]}'s conversation
                     </span>
                   ) : (
                     <span className="sk-pill sk-pill-blue shrink-0" title="This thread runs parent ↔ tutor — visible to the guardian">
@@ -327,7 +327,7 @@ export function PMessages() {
                 {readOnly && !blocked && (
                   <div className="px-4 py-2 bg-[#FFF7EC] border-b border-[#F5D9B8] text-[12px] text-[#8A5A16] flex items-center gap-2">
                     <Eye className="w-3.5 h-3.5 shrink-0" />
-                    Viewing {selected.viewingChildName}'s conversation — read-only, only {selected.viewingChildName.split(" ")[0]} and the
+                    Viewing {selected.viewingChildName}'s conversation — read-only, only {selected.viewingChildName?.split(" ")[0]} and the
                     tutor can post.
                   </div>
                 )}

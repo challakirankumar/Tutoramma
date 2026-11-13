@@ -16,6 +16,9 @@ import { SPayments } from "@/views/student/SPayments";
 import { SLive } from "@/views/live/SLive";
 import { SAssistant } from "@/views/student/SAssistant";
 import { SConcierge } from "@/views/student/SConcierge";
+import { SFlashcards } from "@/views/student/SFlashcards";
+import { SFocus } from "@/views/student/SFocus";
+import { SPlanner } from "@/views/student/SPlanner";
 
 import { PDashboard } from "@/views/parent/PDashboard";
 import { LiveTracking } from "@/views/parent/LiveTracking";
@@ -73,6 +76,9 @@ const VIEWS: Record<string, React.ComponentType> = {
   "s-homework": SHomework,
   "s-assistant": SAssistant,
   "s-concierge": SConcierge,
+  "s-flashcards": SFlashcards,
+  "s-focus": SFocus,
+  "s-planner": SPlanner,
   "s-rewards": SRewards,
   "s-messages": SMessages,
   "s-payments": SPayments,
@@ -131,8 +137,8 @@ export function ViewRenderer() {
     const prefix = view.split("-")[0];
     const fallbackId =
       prefix === "s" ? "s-dashboard" : prefix === "p" ? "p-dashboard" : prefix === "t" ? "t-dashboard" : prefix === "i" ? "i-dashboard" : "a-overview";
-    const fallback = VIEWS[fallbackId];
-    return fallback ? <fallback /> : null;
+    const Fallback = VIEWS[fallbackId];
+    return Fallback ? <Fallback /> : null;
   }
   return (
     <main className={clsx("flex-1 min-w-0", classroom ? "" : "px-4 sm:px-6 py-5 space-y-5")} role="main">

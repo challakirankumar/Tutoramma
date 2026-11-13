@@ -33,6 +33,9 @@ import {
   MessagesSquare,
   Landmark,
   Gauge,
+  Layers,
+  Timer,
+  CalendarClock,
 } from "lucide-react";
 
 export interface NavItem {
@@ -40,6 +43,8 @@ export interface NavItem {
   label: string;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   group?: string;
+  /** small highlight pill, e.g. "New" */
+  badge?: string;
 }
 
 export const NAV: Record<string, NavItem[]> = {
@@ -53,6 +58,9 @@ export const NAV: Record<string, NavItem[]> = {
     { id: "s-timetable", label: "Timetable", icon: CalendarDays, group: "Learn" },
     { id: "s-homework", label: "Homework & Tests", icon: BookOpenCheck, group: "Practice" },
     { id: "s-assistant", label: "AI Study Buddy", icon: Bot, group: "Practice" },
+    { id: "s-flashcards", label: "Smart Flashcards", icon: Layers, group: "Practice", badge: "New" },
+    { id: "s-focus", label: "Focus Studio", icon: Timer, group: "Practice", badge: "New" },
+    { id: "s-planner", label: "Revision Planner", icon: CalendarClock, group: "Practice", badge: "New" },
     { id: "s-rewards", label: "Rewards", icon: Trophy, group: "Practice" },
     { id: "s-messages", label: "Messages", icon: MessageSquare, group: "Practice" },
     { id: "s-payments", label: "Invoices", icon: Receipt, group: "Account" },

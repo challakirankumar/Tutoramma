@@ -1,4 +1,4 @@
-import { seedDemoData } from "@/lib/seed";
+import { seedDemoData } from "@/lib/seed-runtime";
 import { db } from "@/lib/db";
 import { getAuthUser } from "@/lib/auth";
 

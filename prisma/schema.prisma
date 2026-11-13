@@ -619,3 +619,62 @@ model AuditEvent {
   severity   String   @default("info") // info | warning | critical
   createdAt  DateTime @default(now())
 }
+
+// ============ LEARNING TOOLKIT (v2) ============
+
+/// Smart Flashcards — AI-generated decks with SM-2 spaced repetition.
+model FlashDeck {
+  id        String      @id @default(cuid())
+  ownerId   String
+  title     String
+  subject   String      @default("")
+  topic     String      @default("")
+  source    String      @default("ai") // ai | notes | curriculum
+  color     String      @default("#315BE5")
+  createdAt DateTime    @default(now())
+  cards     Flashcard[]
+
+  @@index([ownerId])
+}
+
+model Flashcard {
+  id       String    @id @default(cuid())
+  deckId   String
+  deck     FlashDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  front    String
+  back     String
+  hint     String    @default("")
+  ease     Float     @default(2.5)
+  interval Int       @default(0) // days
+  reps     Int       @default(0)
+  lapses   Int       @default(0)
+  dueAt    DateTime  @default(now())
+  lastReviewedAt DateTime?
+
+  @@index([deckId, dueAt])
+}
+
+/// Focus Studio — completed deep-work sessions.
+model FocusSession {
+  id        String   @id @default(cuid())
+  userId    String
+  minutes   Int
+  label     String   @default("")
+  subject   String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+/// Revision Planner — one active exam plan per student.
+model StudyPlan {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  examName  String
+  examDate  DateTime
+  hoursPerDay Float  @default(2)
+  plan      String   @default("[]") // JSON [{date, tasks:[{id,title,subject,minutes,kind,done}]}]
+  source    String   @default("smart") // ai | smart
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

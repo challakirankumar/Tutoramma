@@ -8,6 +8,7 @@ import { Bell, Menu, LogOut, Search, RefreshCcw } from "lucide-react";
 import { AvatarTile } from "@/components/shared/AvatarTile";
 import { fromNow } from "@/lib/format";
 import { toast } from "@/hooks/use-toast";
+import { openCommandPalette } from "./CommandPalette";
 
 interface Note {
   id: string;
@@ -88,17 +89,22 @@ export function Topbar() {
         <Menu className="w-[18px] h-[18px]" />
       </button>
 
-      {/* compact search */}
-      <div className="relative hidden sm:block flex-1 max-w-[340px]">
+      {/* command palette trigger */}
+      <button
+        className="relative hidden sm:flex items-center flex-1 max-w-[340px] sk-input !py-[7px] !pl-8 !text-[12.5px] text-left text-muted-foreground hover:border-[#B9C6E4]"
+        onClick={openCommandPalette}
+        aria-label="Open command palette"
+      >
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-        <input
-          className="sk-input !py-[7px] !pl-8 !text-[12.5px]"
-          placeholder="Search tutors, subjects, boards…"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && (user.role === "student" || user.role === "parent")) setView("s-find");
-          }}
-        />
-      </div>
+        <span className="truncate">Jump to anything…</span>
+        <span className="ml-auto flex gap-1 shrink-0">
+          <span className="ta-kbd">Ctrl</span>
+          <span className="ta-kbd">K</span>
+        </span>
+      </button>
+      <button className="sm:hidden p-2 rounded-xl hover:bg-[var(--accent)]" onClick={openCommandPalette} aria-label="Search">
+        <Search className="w-[17px] h-[17px]" />
+      </button>
 
       <div className="ml-auto flex items-center gap-1.5" ref={popRef}>
         {/* notifications */}
@@ -164,7 +170,7 @@ export function Topbar() {
                 <div className="text-[11px] text-muted-foreground truncate">{user.email}</div>
               </div>
               <div className="h-px sk-divider my-1" />
-              {user.isDemo && (
+              {user.isDemo && user.role === "admin" && (
                 <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-semibold hover:bg-[var(--accent)]" onClick={resetDemo}>
                   <RefreshCcw className="w-4 h-4 text-muted-foreground" /> Reset data
                 </button>

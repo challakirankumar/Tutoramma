@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { Footer } from "./Footer";
 import { ViewRenderer } from "./ViewRenderer";
+import { CommandPalette } from "./CommandPalette";
 import { useAppStore } from "@/stores/app-store";
 
 export function AppShell() {
@@ -22,6 +23,7 @@ export function AppShell() {
           <Footer />
         </div>
       </div>
+      <CommandPalette />
     </div>
   );
 }

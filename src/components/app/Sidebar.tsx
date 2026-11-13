@@ -90,6 +90,9 @@ export function Sidebar() {
                       >
                         <item.icon className={clsx("w-[17px] h-[17px] shrink-0", active && "text-[#FFD9AE]")} strokeWidth={2.1} />
                         {!collapsed && <span className="truncate">{item.label}</span>}
+                        {!collapsed && item.badge && (
+                          <span className={clsx("ml-auto text-[9px] font-extrabold uppercase tracking-wide px-1.5 py-[1px] rounded-full", active ? "bg-white/20 text-white" : "bg-[#FFF1E4] text-[#E76E0F]")}>{item.badge}</span>
+                        )}
                         {collapsed && (
                           <span className="pointer-events-none absolute left-[64px] z-50 whitespace-nowrap rounded-lg bg-[#14246B] text-white text-[11.5px] font-semibold px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                             {item.label}

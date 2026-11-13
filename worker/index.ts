@@ -28,13 +28,17 @@ interface Env {
 
 let schemaReady: Promise<void> | null = null;
 
+const EXPECTED_TABLES = (SCHEMA_SQL.match(/CREATE TABLE IF NOT EXISTS/g) || []).length;
+
+/** Creates any missing tables/indexes. Idempotent, so it also applies additive schema upgrades. */
 async function ensureSchema(db: D1Database) {
-  const row = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='User'").first();
-  if (row) return;
+  const row = await db
+    .prepare("SELECT count(*) AS c FROM sqlite_master WHERE type='table' AND name NOT LIKE '\\_%' ESCAPE '\\' AND name NOT LIKE 'sqlite_%' AND name <> 'd1_migrations'")
+    .first<{ c: number }>();
+  if ((row?.c ?? 0) >= EXPECTED_TABLES) return;
   const statements = SCHEMA_SQL.split(/;\s*\n/)
     .map((s) => s.replace(/^\s*--.*$/gm, "").trim())
-    .filter(Boolean)
-    .map((s) => s.replace(/^CREATE TABLE /, "CREATE TABLE IF NOT EXISTS ").replace(/^CREATE (UNIQUE )?INDEX /, "CREATE $1INDEX IF NOT EXISTS "));
+    .filter(Boolean);
   await db.batch(statements.map((s) => db.prepare(s)));
 }
 

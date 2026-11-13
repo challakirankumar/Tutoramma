@@ -1,0 +1,46 @@
+// Local-only variant of wrangler.jsonc without the remote-only Workers AI binding,
+// so `wrangler dev -c wrangler.test.jsonc` runs fully offline (AI features use their fallbacks).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tutor-amma",
+  "main": "worker/index.ts",
+  "compatibility_date": "2025-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": { "enabled": true },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "tutor-amma" }
+  ],
+
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tutor-amma-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  
+  "durable_objects": {
+    "bindings": [
+      { "name": "LIVEHUB", "class_name": "LiveHubDO" },
+      { "name": "CLASSROOMHUB", "class_name": "ClassroomHubDO" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["LiveHubDO", "ClassroomHubDO"] }
+  ],
+  "vars": {
+    "AI_TEXT_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "AI_VISION_MODEL": "@cf/meta/llama-4-scout-17b-16e-instruct"
+  }
+
+
+
+
+}

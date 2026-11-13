@@ -14,7 +14,7 @@ const cache = new WeakMap<object, PrismaClient>();
 
 export function getDb(): PrismaClient {
   const { env } = getCloudflareContext();
-  const d1 = (env as CloudflareEnv).DB;
+  const d1 = (env as unknown as CloudflareEnv).DB;
   if (!d1) throw new Error("D1 binding `DB` is not configured. Check wrangler.jsonc.");
   let client = cache.get(d1);
   if (!client) {

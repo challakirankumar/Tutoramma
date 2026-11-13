@@ -1,5 +1,6 @@
 "use client";
 
+import { LearningPulse } from "@/components/shared/LearningPulse";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/stores/app-store";
 import { LoadingView, EmptyState, SectionTitle } from "@/components/shared/Section";
@@ -198,6 +199,8 @@ export function SDashboard() {
           tone="orange"
         />
       </div>
+
+      <LearningPulse />
 
       {/* ---------- next class ---------- */}
       <div className="sk-card p-5">

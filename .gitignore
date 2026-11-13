@@ -69,4 +69,3 @@ public/*.zip
 .dev.vars*
 !.dev.vars.example
 /reference/
-wrangler.test.jsonc

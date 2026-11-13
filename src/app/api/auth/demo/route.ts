@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { seedDemoData } from "@/lib/seed";
+import { seedDemoData } from "@/lib/seed-runtime";
 import { hashPassword, signToken, SESSION_COOKIE } from "@/lib/auth";
 
 const DEMO_ACCOUNTS: Record<string, string> = {

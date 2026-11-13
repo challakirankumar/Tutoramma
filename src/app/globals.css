@@ -603,3 +603,46 @@ nextjs-portal {
   border-radius: 24px;
   box-shadow: 0 24px 60px rgba(20, 36, 107, 0.16);
 }
+
+/* ============================================================
+   v2 · Learning Toolkit — flip cards, timer ring, heatmap
+   ============================================================ */
+.flip-scene { perspective: 1400px; }
+.flip-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1);
+}
+.flip-card.is-flipped { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 22px;
+}
+.flip-back { transform: rotateY(180deg); }
+
+.ta-heat-cell { width: 13px; height: 13px; border-radius: 3.5px; }
+.ta-pop-in { animation: ta-pop .45s cubic-bezier(.22,1,.36,1) both; }
+@keyframes ta-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+.ta-breathe { animation: ta-breathe 4s ease-in-out infinite; }
+@keyframes ta-breathe { 0%,100% { transform: scale(1); opacity: .55; } 50% { transform: scale(1.06); opacity: .9; } }
+.ta-shimmer {
+  background: linear-gradient(90deg, #E8EDF8 0%, #F6F8FD 40%, #E8EDF8 80%);
+  background-size: 200% 100%;
+  animation: ta-shimmer 1.4s linear infinite;
+}
+@keyframes ta-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.ta-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 5px;
+  font-size: 10px; font-weight: 700; color: #57627F;
+  background: linear-gradient(180deg,#FFFFFF,#EEF2FA);
+  border: 1px solid #D6DEEE; box-shadow: 0 1px 0 #C9D3E8;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-card, .ta-pop-in, .ta-breathe, .ta-shimmer { transition: none !important; animation: none !important; }
+}

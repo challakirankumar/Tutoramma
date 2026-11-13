@@ -61,7 +61,7 @@ interface Slot {
   startAt: string;
   label: string;
 }
-interface TutorDetail extends TutorCardData {
+interface TutorDetail extends Omit<TutorCardData, "reviews"> {
   bio: string;
   qualifications: unknown[];
   experience: unknown[];

@@ -18,9 +18,12 @@ export const metadata: Metadata = {
   description:
     "Tutor Amma is a verified tutor marketplace: online 1:1, safe home tuition with OTP check-in, geofence and live tracking, group batches, escrow payments, AI lesson plans and question papers.",
   keywords: ["Tutor Amma", "tutoring", "home tuition", "verified tutors", "lesson plans", "question papers", "India"],
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/brand/tutor-amma-logo.png",
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
   },
+  appleWebApp: { capable: true, title: "Tutor Amma", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

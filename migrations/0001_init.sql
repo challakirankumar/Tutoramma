@@ -1,5 +1,6 @@
+-- Tutor Amma D1 schema (generated from prisma/schema.prisma, made idempotent).
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -16,7 +17,7 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "StudentProfile" (
+CREATE TABLE IF NOT EXISTS "StudentProfile" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "grade" TEXT NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE "StudentProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "ParentProfile" (
+CREATE TABLE IF NOT EXISTS "ParentProfile" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "emergencyName" TEXT NOT NULL DEFAULT '',
@@ -46,7 +47,7 @@ CREATE TABLE "ParentProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "InstituteProfile" (
+CREATE TABLE IF NOT EXISTS "InstituteProfile" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "academyName" TEXT NOT NULL,
@@ -57,7 +58,7 @@ CREATE TABLE "InstituteProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "TutorProfile" (
+CREATE TABLE IF NOT EXISTS "TutorProfile" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "headline" TEXT NOT NULL DEFAULT '',
@@ -86,7 +87,7 @@ CREATE TABLE "TutorProfile" (
 );
 
 -- CreateTable
-CREATE TABLE "TutorDocument" (
+CREATE TABLE IF NOT EXISTS "TutorDocument" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
@@ -99,7 +100,7 @@ CREATE TABLE "TutorDocument" (
 );
 
 -- CreateTable
-CREATE TABLE "CurriculumBoard" (
+CREATE TABLE IF NOT EXISTS "CurriculumBoard" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -121,7 +122,7 @@ CREATE TABLE "CurriculumBoard" (
 );
 
 -- CreateTable
-CREATE TABLE "CurriculumGrade" (
+CREATE TABLE IF NOT EXISTS "CurriculumGrade" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "boardId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -129,7 +130,7 @@ CREATE TABLE "CurriculumGrade" (
 );
 
 -- CreateTable
-CREATE TABLE "CurriculumSubject" (
+CREATE TABLE IF NOT EXISTS "CurriculumSubject" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "boardId" TEXT NOT NULL,
     "gradeId" TEXT NOT NULL,
@@ -139,7 +140,7 @@ CREATE TABLE "CurriculumSubject" (
 );
 
 -- CreateTable
-CREATE TABLE "CurriculumChapter" (
+CREATE TABLE IF NOT EXISTS "CurriculumChapter" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "subjectId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -152,7 +153,7 @@ CREATE TABLE "CurriculumChapter" (
 );
 
 -- CreateTable
-CREATE TABLE "CurriculumTopic" (
+CREATE TABLE IF NOT EXISTS "CurriculumTopic" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "chapterId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -163,7 +164,7 @@ CREATE TABLE "CurriculumTopic" (
 );
 
 -- CreateTable
-CREATE TABLE "Offering" (
+CREATE TABLE IF NOT EXISTS "Offering" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "boardId" TEXT NOT NULL,
@@ -174,7 +175,7 @@ CREATE TABLE "Offering" (
 );
 
 -- CreateTable
-CREATE TABLE "Address" (
+CREATE TABLE IF NOT EXISTS "Address" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "ownerId" TEXT NOT NULL,
     "label" TEXT NOT NULL,
@@ -186,7 +187,7 @@ CREATE TABLE "Address" (
 );
 
 -- CreateTable
-CREATE TABLE "Booking" (
+CREATE TABLE IF NOT EXISTS "Booking" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "tutorId" TEXT NOT NULL,
@@ -213,7 +214,7 @@ CREATE TABLE "Booking" (
 );
 
 -- CreateTable
-CREATE TABLE "HomeSession" (
+CREATE TABLE IF NOT EXISTS "HomeSession" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "bookingId" TEXT NOT NULL,
     "stage" TEXT NOT NULL DEFAULT 'scheduled',
@@ -238,7 +239,7 @@ CREATE TABLE "HomeSession" (
 );
 
 -- CreateTable
-CREATE TABLE "AlertEvent" (
+CREATE TABLE IF NOT EXISTS "AlertEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "sessionId" TEXT,
     "bookingRef" TEXT,
@@ -250,7 +251,7 @@ CREATE TABLE "AlertEvent" (
 );
 
 -- CreateTable
-CREATE TABLE "LocationPing" (
+CREATE TABLE IF NOT EXISTS "LocationPing" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "sessionId" TEXT NOT NULL,
     "stage" TEXT NOT NULL DEFAULT 'enroute',
@@ -263,7 +264,7 @@ CREATE TABLE "LocationPing" (
 );
 
 -- CreateTable
-CREATE TABLE "Incident" (
+CREATE TABLE IF NOT EXISTS "Incident" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "sessionId" TEXT NOT NULL,
     "bookingRef" TEXT,
@@ -280,7 +281,7 @@ CREATE TABLE "Incident" (
 );
 
 -- CreateTable
-CREATE TABLE "Batch" (
+CREATE TABLE IF NOT EXISTS "Batch" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "instituteEmail" TEXT,
@@ -303,7 +304,7 @@ CREATE TABLE "Batch" (
 );
 
 -- CreateTable
-CREATE TABLE "BatchSeat" (
+CREATE TABLE IF NOT EXISTS "BatchSeat" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "batchId" TEXT NOT NULL,
     "studentId" TEXT NOT NULL,
@@ -312,7 +313,7 @@ CREATE TABLE "BatchSeat" (
 );
 
 -- CreateTable
-CREATE TABLE "Payment" (
+CREATE TABLE IF NOT EXISTS "Payment" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "bookingId" TEXT,
     "batchId" TEXT,
@@ -332,7 +333,7 @@ CREATE TABLE "Payment" (
 );
 
 -- CreateTable
-CREATE TABLE "LedgerEntry" (
+CREATE TABLE IF NOT EXISTS "LedgerEntry" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "paymentId" TEXT NOT NULL,
     "account" TEXT NOT NULL,
@@ -344,7 +345,7 @@ CREATE TABLE "LedgerEntry" (
 );
 
 -- CreateTable
-CREATE TABLE "Invoice" (
+CREATE TABLE IF NOT EXISTS "Invoice" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "number" TEXT NOT NULL,
     "paymentId" TEXT NOT NULL,
@@ -357,7 +358,7 @@ CREATE TABLE "Invoice" (
 );
 
 -- CreateTable
-CREATE TABLE "Wallet" (
+CREATE TABLE IF NOT EXISTS "Wallet" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "available" INTEGER NOT NULL DEFAULT 0,
@@ -369,7 +370,7 @@ CREATE TABLE "Wallet" (
 );
 
 -- CreateTable
-CREATE TABLE "Payout" (
+CREATE TABLE IF NOT EXISTS "Payout" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
@@ -380,7 +381,7 @@ CREATE TABLE "Payout" (
 );
 
 -- CreateTable
-CREATE TABLE "LessonPlan" (
+CREATE TABLE IF NOT EXISTS "LessonPlan" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -406,7 +407,7 @@ CREATE TABLE "LessonPlan" (
 );
 
 -- CreateTable
-CREATE TABLE "QuestionPaper" (
+CREATE TABLE IF NOT EXISTS "QuestionPaper" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "lessonPlanId" TEXT,
@@ -430,7 +431,7 @@ CREATE TABLE "QuestionPaper" (
 );
 
 -- CreateTable
-CREATE TABLE "LiveClass" (
+CREATE TABLE IF NOT EXISTS "LiveClass" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "batchId" TEXT,
@@ -459,7 +460,7 @@ CREATE TABLE "LiveClass" (
 );
 
 -- CreateTable
-CREATE TABLE "TimetableEntry" (
+CREATE TABLE IF NOT EXISTS "TimetableEntry" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "ownerType" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,
@@ -476,7 +477,7 @@ CREATE TABLE "TimetableEntry" (
 );
 
 -- CreateTable
-CREATE TABLE "Homework" (
+CREATE TABLE IF NOT EXISTS "Homework" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tutorId" TEXT NOT NULL,
     "studentId" TEXT,
@@ -494,7 +495,7 @@ CREATE TABLE "Homework" (
 );
 
 -- CreateTable
-CREATE TABLE "TestResult" (
+CREATE TABLE IF NOT EXISTS "TestResult" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -507,7 +508,7 @@ CREATE TABLE "TestResult" (
 );
 
 -- CreateTable
-CREATE TABLE "PassportTopic" (
+CREATE TABLE IF NOT EXISTS "PassportTopic" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "subject" TEXT NOT NULL,
@@ -516,14 +517,14 @@ CREATE TABLE "PassportTopic" (
 );
 
 -- CreateTable
-CREATE TABLE "SavedTutor" (
+CREATE TABLE IF NOT EXISTS "SavedTutor" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "tutorId" TEXT NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "MessageThread" (
+CREATE TABLE IF NOT EXISTS "MessageThread" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "tutorId" TEXT NOT NULL,
@@ -534,7 +535,7 @@ CREATE TABLE "MessageThread" (
 );
 
 -- CreateTable
-CREATE TABLE "MessageReport" (
+CREATE TABLE IF NOT EXISTS "MessageReport" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "threadId" TEXT NOT NULL,
     "reporterId" TEXT NOT NULL,
@@ -545,7 +546,7 @@ CREATE TABLE "MessageReport" (
 );
 
 -- CreateTable
-CREATE TABLE "Message" (
+CREATE TABLE IF NOT EXISTS "Message" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "threadId" TEXT NOT NULL,
     "senderId" TEXT NOT NULL,
@@ -557,7 +558,7 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
-CREATE TABLE "Notification" (
+CREATE TABLE IF NOT EXISTS "Notification" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -570,7 +571,7 @@ CREATE TABLE "Notification" (
 );
 
 -- CreateTable
-CREATE TABLE "Dispute" (
+CREATE TABLE IF NOT EXISTS "Dispute" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "bookingId" TEXT NOT NULL,
     "raisedBy" TEXT NOT NULL,
@@ -581,7 +582,7 @@ CREATE TABLE "Dispute" (
 );
 
 -- CreateTable
-CREATE TABLE "ParentReport" (
+CREATE TABLE IF NOT EXISTS "ParentReport" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "studentId" TEXT NOT NULL,
     "tutorId" TEXT NOT NULL,
@@ -593,7 +594,7 @@ CREATE TABLE "ParentReport" (
 );
 
 -- CreateTable
-CREATE TABLE "AuditEvent" (
+CREATE TABLE IF NOT EXISTS "AuditEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "actorName" TEXT NOT NULL,
     "actorRole" TEXT NOT NULL,
@@ -604,48 +605,111 @@ CREATE TABLE "AuditEvent" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "FlashDeck" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "ownerId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "subject" TEXT NOT NULL DEFAULT '',
+    "topic" TEXT NOT NULL DEFAULT '',
+    "source" TEXT NOT NULL DEFAULT 'ai',
+    "color" TEXT NOT NULL DEFAULT '#315BE5',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Flashcard" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "deckId" TEXT NOT NULL,
+    "front" TEXT NOT NULL,
+    "back" TEXT NOT NULL,
+    "hint" TEXT NOT NULL DEFAULT '',
+    "ease" REAL NOT NULL DEFAULT 2.5,
+    "interval" INTEGER NOT NULL DEFAULT 0,
+    "reps" INTEGER NOT NULL DEFAULT 0,
+    "lapses" INTEGER NOT NULL DEFAULT 0,
+    "dueAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastReviewedAt" DATETIME,
+    CONSTRAINT "Flashcard_deckId_fkey" FOREIGN KEY ("deckId") REFERENCES "FlashDeck" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "FocusSession" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "minutes" INTEGER NOT NULL,
+    "label" TEXT NOT NULL DEFAULT '',
+    "subject" TEXT NOT NULL DEFAULT '',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "StudyPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "examName" TEXT NOT NULL,
+    "examDate" DATETIME NOT NULL,
+    "hoursPerDay" REAL NOT NULL DEFAULT 2,
+    "plan" TEXT NOT NULL DEFAULT '[]',
+    "source" TEXT NOT NULL DEFAULT 'smart',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "StudentProfile_userId_key" ON "StudentProfile"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ParentProfile_userId_key" ON "ParentProfile"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "StudentProfile_userId_key" ON "StudentProfile"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "InstituteProfile_userId_key" ON "InstituteProfile"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "ParentProfile_userId_key" ON "ParentProfile"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TutorProfile_userId_key" ON "TutorProfile"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "InstituteProfile_userId_key" ON "InstituteProfile"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CurriculumBoard_code_key" ON "CurriculumBoard"("code");
+CREATE UNIQUE INDEX IF NOT EXISTS "TutorProfile_userId_key" ON "TutorProfile"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "HomeSession_bookingId_key" ON "HomeSession"("bookingId");
+CREATE UNIQUE INDEX IF NOT EXISTS "CurriculumBoard_code_key" ON "CurriculumBoard"("code");
 
 -- CreateIndex
-CREATE INDEX "LocationPing_sessionId_ts_idx" ON "LocationPing"("sessionId", "ts");
+CREATE UNIQUE INDEX IF NOT EXISTS "HomeSession_bookingId_key" ON "HomeSession"("bookingId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Payment_bookingId_key" ON "Payment"("bookingId");
+CREATE INDEX IF NOT EXISTS "LocationPing_sessionId_ts_idx" ON "LocationPing"("sessionId", "ts");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Invoice_number_key" ON "Invoice"("number");
+CREATE UNIQUE INDEX IF NOT EXISTS "Payment_bookingId_key" ON "Payment"("bookingId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Invoice_paymentId_key" ON "Invoice"("paymentId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Invoice_number_key" ON "Invoice"("number");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Wallet_userId_key" ON "Wallet"("userId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Invoice_paymentId_key" ON "Invoice"("paymentId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "LiveClass_code_key" ON "LiveClass"("code");
+CREATE UNIQUE INDEX IF NOT EXISTS "Wallet_userId_key" ON "Wallet"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "LiveClass_slug_key" ON "LiveClass"("slug");
+CREATE UNIQUE INDEX IF NOT EXISTS "LiveClass_code_key" ON "LiveClass"("code");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ParentReport_studentId_tutorId_weekStart_key" ON "ParentReport"("studentId", "tutorId", "weekStart");
+CREATE UNIQUE INDEX IF NOT EXISTS "LiveClass_slug_key" ON "LiveClass"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "ParentReport_studentId_tutorId_weekStart_key" ON "ParentReport"("studentId", "tutorId", "weekStart");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "FlashDeck_ownerId_idx" ON "FlashDeck"("ownerId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Flashcard_deckId_dueAt_idx" ON "Flashcard"("deckId", "dueAt");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "FocusSession_userId_createdAt_idx" ON "FocusSession"("userId", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "StudyPlan_userId_key" ON "StudyPlan"("userId");
 

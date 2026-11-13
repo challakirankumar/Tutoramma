@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": [],
+    "strict": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": true
+  },
+  "include": ["./*.ts", "../cloudflare-env.d.ts"]
+}

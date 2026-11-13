@@ -9,6 +9,11 @@ import {
   GraduationCap, Baby, UserCog, Loader2, Search, Radar, ChevronRight, CalendarCheck, Landmark,
   SearchCheck, Target, Wallet, BookOpen, Activity, NotebookPen, MessageCircleQuestion, ScanLine,
   ConciergeBell, BellRing, Split, Languages, LogIn, Link2, Heart, Download,
+  Layers as LayersIcon,
+  Timer as TimerIcon,
+  CalendarClock as CalendarClockIcon,
+  Command as CommandIcon,
+  Zap as ZapIcon,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AvatarTile } from "@/components/shared/AvatarTile";
@@ -815,6 +820,42 @@ export function Landing() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ===== v2 learning toolkit ===== */}
+        <section id="toolkit" className="max-w-6xl mx-auto px-4 sm:px-6 mt-14 sm:mt-16 scroll-mt-[120px] lg:scroll-mt-[96px]" aria-labelledby="toolkit-title">
+          <div
+            className="rounded-[26px] p-6 sm:p-9 text-white relative overflow-hidden"
+            style={{ background: "linear-gradient(135deg,#33549E 0%,#1B2F79 50%,#14246B 100%)", boxShadow: "0 20px 60px rgba(20,36,107,.25)" }}
+          >
+            <div className="relative z-10 grid lg:grid-cols-5 gap-8 items-center">
+              <div className="lg:col-span-2">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#FFC27A]">
+                  <ZapIcon className="w-3.5 h-3.5" aria-hidden /> New · Study toolkit
+                </span>
+                <h2 id="toolkit-title" className="text-[24px] sm:text-[30px] font-extrabold tracking-[-0.015em] mt-2 leading-tight">
+                  Learn smarter between classes
+                </h2>
+                <p className="text-[13.5px] text-white/75 leading-relaxed mt-2.5">
+                  Science-backed tools that turn every tuition session into lasting memory — powered by AI running on Cloudflare&apos;s global network.
+                </p>
+              </div>
+              <div className="lg:col-span-3 grid sm:grid-cols-2 gap-3">
+                {[
+                  { icon: LayersIcon, title: "Smart Flashcards", desc: "AI writes cards from any chapter or your notes; spaced repetition schedules each review right before you'd forget." },
+                  { icon: TimerIcon, title: "Focus Studio", desc: "Pomodoro & deep-work timer with generated rain, ocean and brown-noise soundscapes, XP and a consistency heatmap." },
+                  { icon: CalendarClockIcon, title: "Revision Planner", desc: "A day-by-day exam plan: weak topics first, 1-3-7 spaced revision, light days, mock tests and calendar export." },
+                  { icon: CommandIcon, title: "Command palette", desc: "Press Ctrl / ⌘ K anywhere to jump to any page or start a focus block in one keystroke." },
+                ].map((f) => (
+                  <div key={f.title} className="rounded-2xl bg-white/[0.08] border border-white/10 p-4 backdrop-blur-sm">
+                    <f.icon className="w-5 h-5 text-[#FFC27A]" aria-hidden />
+                    <h3 className="text-[13.5px] font-bold mt-2">{f.title}</h3>
+                    <p className="text-[11.5px] leading-relaxed text-white/70 mt-1">{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
