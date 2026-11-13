@@ -72,11 +72,8 @@ Browser ──► Cloudflare Worker (worker/index.ts)
 - `npm install`
 - `npx wrangler login`
 
-### 2. Create the D1 database
-```bash
-npx wrangler d1 create tutor-amma-db
-```
-Copy the printed `database_id` into `wrangler.jsonc`, replacing `REPLACE_WITH_YOUR_D1_DATABASE_ID`. Commit that change.
+### 2. D1 database
+Nothing to do. On the first deploy Wrangler creates a D1 database named `tutor-amma-db` and binds it to the Worker. The tables and demo data are created on first use.
 
 ### 3. Set secrets
 ```bash
@@ -95,7 +92,7 @@ This builds the app, applies the D1 migrations and uploads the Worker. When it f
 
 **Cloudflare dashboard (Workers Builds):**
 1. Go to **Workers & Pages → Create → Import a repository** and pick this repo.
-2. Set the build command to `npm run cf:build`.
+2. Keep the build command as `npm run build` (the default).
 3. Set the deploy command to `npx opennextjs-cloudflare deploy`.
 4. Add `AUTH_SECRET` and `INTERNAL_SECRET` under **Settings → Variables and Secrets**.
 
