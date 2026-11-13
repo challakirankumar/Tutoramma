@@ -1,0 +1,605 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-navy: var(--navy);
+  --color-royal: var(--royal);
+  --color-orange: var(--orange);
+  --color-canvas: var(--canvas);
+}
+
+/* ============================================================
+   TUTOR AMMA · Rich White Skeuomorphic — Daylight mode only
+   Brand: Navy #14246B · Royal #315BE5 · Orange #F47B20
+   Canvas #F5F7FC · Cards 18px radius, soft navy shadows
+   ============================================================ */
+
+:root {
+  --radius: 0.75rem;
+
+  --navy: #14246B;
+  --navy-deep: #0E1A52;
+  --navy-soft: #26418F;
+  --royal: #315BE5;
+  --orange: #F47B20;
+  --orange-deep: #E06A0C;
+  --canvas: #F5F7FC;
+
+  --background: #F5F7FC;
+  --foreground: #1C2440;
+  --card: #FFFFFF;
+  --card-foreground: #1C2440;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C2440;
+  --primary: #14246B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EDF1FA;
+  --secondary-foreground: #2A3560;
+  --muted: #EEF2F9;
+  --muted-foreground: #6B7694;
+  --accent: #EDF1FA;
+  --accent-foreground: #2A3560;
+  --destructive: #D64550;
+  --destructive-foreground: #FFFFFF;
+  --border: #E3E9F4;
+  --input: #DFE6F2;
+  --ring: #315BE5;
+  --chart-1: #14246B;
+  --chart-2: #F47B20;
+  --chart-3: #315BE5;
+  --chart-4: #1F9D68;
+  --chart-5: #9A7EDB;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #2A3560;
+  --sidebar-primary: #14246B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EDF1FA;
+  --sidebar-accent-foreground: #14246B;
+  --sidebar-border: #E3E9F4;
+  --sidebar-ring: #315BE5;
+  --success: #1F9D68;
+  --notice: #DF8B32;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-size: 15px;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "tnum" off;
+    background-image:
+      radial-gradient(1200px 500px at 85% -10%, rgba(49, 91, 229, 0.05), transparent 60%),
+      radial-gradient(900px 420px at -10% 110%, rgba(244, 123, 32, 0.04), transparent 55%);
+    background-attachment: fixed;
+  }
+}
+
+/* ============ TYPOGRAPHY HELPERS ============ */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+.text-brand-navy { color: var(--navy); }
+.text-brand-orange { color: var(--orange-deep); }
+
+/* ============ SKEUOMORPHIC CARDS ============ */
+.sk-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 30px rgba(20, 36, 107, 0.07),
+    0 1px 3px rgba(20, 36, 107, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.sk-card-flat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 2px 10px rgba(20, 36, 107, 0.05);
+}
+
+/* Inset / pressed well */
+.sk-well {
+  background: linear-gradient(180deg, #EDF1F9, #F7F9FE);
+  border: 1px solid #DDE4F0;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 2px 5px rgba(20, 36, 107, 0.08),
+    inset 0 1px 2px rgba(20, 36, 107, 0.06);
+}
+
+/* ============ SKEUOMORPHIC BUTTONS ============ */
+.sk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0.62rem 1.05rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.sk-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.sk-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sk-btn-primary {
+  background: linear-gradient(180deg, #33549E 0%, #1B2F79 45%, #14246B 100%);
+  color: #fff;
+  border-color: #101D5C;
+  box-shadow:
+    0 3px 8px rgba(20, 36, 107, 0.35),
+    0 1px 2px rgba(20, 36, 107, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.18);
+}
+.sk-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow:
+    0 5px 14px rgba(20, 36, 107, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.18);
+}
+
+.sk-btn-orange {
+  background: linear-gradient(180deg, #FFA24D 0%, #F68A2E 45%, #E76E0F 100%);
+  color: #fff;
+  border-color: #D66408;
+  box-shadow:
+    0 3px 8px rgba(231, 110, 15, 0.35),
+    0 1px 2px rgba(231, 110, 15, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -2px 4px rgba(140, 60, 0, 0.2);
+}
+.sk-btn-orange:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow:
+    0 5px 14px rgba(231, 110, 15, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(140, 60, 0, 0.2);
+}
+
+.sk-btn-ghost {
+  background: linear-gradient(180deg, #FFFFFF, #F1F4FB);
+  color: #2A3560;
+  border-color: #D6DEEE;
+  box-shadow:
+    0 2px 5px rgba(20, 36, 107, 0.1),
+    inset 0 1px 0 #FFFFFF;
+}
+.sk-btn-ghost:hover:not(:disabled) {
+  background: linear-gradient(180deg, #FFFFFF, #E9EEF9);
+}
+
+.sk-btn-danger {
+  background: linear-gradient(180deg, #E96A75 0%, #D64550 50%, #C03342 100%);
+  color: #fff;
+  border-color: #B12E3C;
+  box-shadow:
+    0 3px 8px rgba(198, 52, 66, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(120, 20, 30, 0.25);
+}
+
+.sk-btn-success {
+  background: linear-gradient(180deg, #46BD85 0%, #27A46C 50%, #1F9D68 100%);
+  color: #fff;
+  border-color: #178A59;
+  box-shadow:
+    0 3px 8px rgba(31, 157, 104, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(10, 90, 55, 0.22);
+}
+
+.sk-btn-sm {
+  padding: 0.42rem 0.8rem;
+  font-size: 0.78rem;
+  border-radius: 10px;
+}
+.sk-btn-lg {
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+  border-radius: 14px;
+}
+
+/* ============ PILLS (skeuomorphic) ============ */
+.sk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  padding: 0.24rem 0.66rem;
+  line-height: 1.25;
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 1px 2px rgba(20, 36, 107, 0.08);
+  white-space: nowrap;
+}
+.sk-pill-green {
+  background: linear-gradient(180deg, #E2F6EC, #CDEEDA);
+  color: #156F4C;
+  border-color: #B5E3CB;
+}
+.sk-pill-orange {
+  background: linear-gradient(180deg, #FFEFD9, #FFE1BC);
+  color: #A45A0C;
+  border-color: #F5CFA0;
+}
+.sk-pill-red {
+  background: linear-gradient(180deg, #FDE3E5, #F9CED2);
+  color: #A62F3C;
+  border-color: #F2B8BE;
+}
+.sk-pill-blue {
+  background: linear-gradient(180deg, #E4EBFC, #D4DFFA);
+  color: #2A4BB8;
+  border-color: #BFCDF6;
+}
+.sk-pill-navy {
+  background: linear-gradient(180deg, #3A54A5, #22357F);
+  color: #fff;
+  border-color: #1A2A6B;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 4px rgba(20, 36, 107, 0.3);
+}
+.sk-pill-grey {
+  background: linear-gradient(180deg, #EEF1F8, #DFE5F0);
+  color: #57627F;
+  border-color: #D0D8E8;
+}
+
+/* ============ CHIPS (selectable) ============ */
+.sk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.42rem 0.9rem;
+  cursor: pointer;
+  border: 1px solid #D6DEEE;
+  background: linear-gradient(180deg, #FFFFFF, #F0F3FA);
+  color: #4A5578;
+  box-shadow: 0 1px 3px rgba(20, 36, 107, 0.08), inset 0 1px 0 #fff;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.sk-chip:hover { border-color: #B9C6E4; color: #22357F; }
+.sk-chip-active {
+  background: linear-gradient(180deg, #33549E, #1B2F79);
+  color: #fff;
+  border-color: #101D5C;
+  box-shadow: 0 3px 8px rgba(20, 36, 107, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ============ INPUTS (inset) ============ */
+.sk-input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #D6DEEE;
+  background: linear-gradient(180deg, #F4F6FC, #FBFCFE);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  color: #1C2440;
+  box-shadow: inset 0 2px 4px rgba(20, 36, 107, 0.07), inset 0 1px 1px rgba(20, 36, 107, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+.sk-input:focus {
+  border-color: #315BE5;
+  box-shadow: inset 0 2px 4px rgba(20, 36, 107, 0.06), 0 0 0 3px rgba(49, 91, 229, 0.14);
+}
+.sk-input::placeholder { color: #98A2BC; }
+
+/* ============ PROGRESS (glossy) ============ */
+.sk-progress-track {
+  height: 9px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #DDE4F2, #E9EEF8);
+  box-shadow: inset 0 1px 3px rgba(20, 36, 107, 0.15), inset 0 1px 1px rgba(20, 36, 107, 0.08);
+  overflow: hidden;
+}
+.sk-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4C6BC4, #22357F);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(20, 36, 107, 0.3);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sk-progress-fill-orange {
+  background: linear-gradient(180deg, #FFAB5E, #E97414);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(231, 110, 15, 0.35);
+}
+.sk-progress-fill-green {
+  background: linear-gradient(180deg, #5CCB93, #1F9D68);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(31, 157, 104, 0.35);
+}
+
+/* ============ AVATAR TILE ============ */
+.sk-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-weight: 700;
+  color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 2px 5px rgba(20, 36, 107, 0.18);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+}
+
+/* ============ SEGMENTED CONTROL ============ */
+.sk-segment {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #E2E8F4, #EDF1F9);
+  border: 1px solid #D6DEEE;
+  box-shadow: inset 0 1px 3px rgba(20, 36, 107, 0.1);
+}
+.sk-segment-item {
+  border-radius: 9px;
+  padding: 0.38rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #57627F;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+}
+.sk-segment-item-active {
+  background: linear-gradient(180deg, #FFFFFF, #F2F5FC);
+  color: #14246B;
+  box-shadow: 0 1px 3px rgba(20, 36, 107, 0.15), inset 0 1px 0 #fff;
+}
+
+/* ============ CALLOUT ============ */
+.sk-callout {
+  border-radius: 14px;
+  padding: 0.9rem 1.05rem;
+  font-size: 0.84rem;
+  border: 1px solid;
+  line-height: 1.5;
+}
+.sk-callout-info {
+  background: linear-gradient(180deg, #EDF2FE, #E4EBFD);
+  border-color: #C9D7F8;
+  color: #2A4BB8;
+}
+.sk-callout-warn {
+  background: linear-gradient(180deg, #FFF4E4, #FEEED8);
+  border-color: #F5D9AE;
+  color: #8F5A10;
+}
+.sk-callout-danger {
+  background: linear-gradient(180deg, #FDEBED, #FADFE2);
+  border-color: #F2C2C7;
+  color: #A62F3C;
+}
+
+/* ============ STEPPER PILLS ============ */
+.sk-step {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8B95B2;
+  background: transparent;
+}
+.sk-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: linear-gradient(180deg, #E4E9F4, #D4DCEC);
+  color: #7C88A8;
+  box-shadow: inset 0 1px 2px rgba(20, 36, 107, 0.12);
+}
+.sk-step-active {
+  color: #14246B;
+}
+.sk-step-active .sk-step-dot {
+  background: linear-gradient(180deg, #33549E, #14246B);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(20, 36, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.sk-step-done { color: #156F4C; }
+.sk-step-done .sk-step-dot {
+  background: linear-gradient(180deg, #46BD85, #1F9D68);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(31, 157, 104, 0.35);
+}
+
+/* ============ MISC ============ */
+.sk-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+}
+
+.gloss-title {
+  background: linear-gradient(135deg, #14246B 30%, #315BE5 75%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Premium sidebar wordmark — two-tone: Tutor midnight blue, Amma rich orange */
+.brand-wordmark {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  display: inline-flex;
+  align-items: baseline;
+  line-height: 1;
+}
+.brand-wordmark .word-tutor {
+  color: #14246B; /* midnight blue */
+}
+.brand-wordmark .word-amma {
+  color: #F47B20; /* rich class orange */
+  margin-left: 0.32em;
+}
+/* collapsed rail monogram keeps the same two-tone pairing */
+.brand-monogram {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: baseline;
+}
+.brand-monogram .word-tutor {
+  color: #14246B;
+}
+.brand-monogram .word-amma {
+  color: #F47B20;
+}
+.brand-wordmark-sub {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #8B95B2;
+  background: none;
+  -webkit-text-fill-color: #8B95B2;
+}
+
+.sk-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.sk-scroll::-webkit-scrollbar-track { background: transparent; }
+.sk-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C3CDE6, #AAB8D8);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(214, 69, 80, 0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(214, 69, 80, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 69, 80, 0); }
+}
+.sos-pulse { animation: pulse-ring 1.6s infinite; }
+
+@keyframes marker-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.marker-bounce { animation: marker-bounce 1.8s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Hide the Next.js dev-tools floating button (dev-only artifact) for a pristine product feel */
+nextjs-portal {
+  display: none !important;
+}
+
+/* ============ LANDING — premium layered backdrop ============ */
+.landing-bg {
+  background:
+    radial-gradient(880px 460px at 88% -12%, rgba(49, 91, 229, 0.10), transparent 62%),
+    radial-gradient(680px 420px at -8% 6%, rgba(244, 123, 32, 0.09), transparent 56%),
+    radial-gradient(1100px 640px at 50% 118%, rgba(20, 36, 107, 0.07), transparent 62%);
+}
+.landing-grid {
+  background-image:
+    linear-gradient(to right, rgba(20, 36, 107, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 36, 107, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), transparent 78%);
+}
+
+/* soft tinted trust pills for the hero
+   (no `display` here — unlayered CSS would beat Tailwind's `hidden`
+   responsive utilities; usages add inline-flex themselves) */
+.hero-pill {
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid rgba(20, 36, 107, 0.10);
+  background: linear-gradient(180deg, #FFFFFF, #F7F9FE);
+  box-shadow: 0 1px 2px rgba(20, 36, 107, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #23305E;
+}
+.hero-pill svg { color: var(--orange); }
+
+/* gradient ring wrapper for the auth card */
+.auth-ring {
+  background: linear-gradient(150deg, rgba(20, 36, 107, 0.55), rgba(49, 91, 229, 0.28) 34%, rgba(244, 123, 32, 0.42) 100%);
+  padding: 1.5px;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(20, 36, 107, 0.16);
+}

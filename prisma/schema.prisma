@@ -1,0 +1,621 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["queryCompiler", "driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ IDENTITY ============
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  name         String
+  role         String // student | parent | tutor | institute | admin
+  phone        String?
+  country      String   @default("India")
+  city         String   @default("Chennai")
+  locale       String   @default("en")
+  avatarColor  String   @default("#315BE5")
+  isDemo       Boolean  @default(false)
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+
+  studentProfile  StudentProfile?
+  tutorProfile    TutorProfile?
+  parentProfile   ParentProfile?
+  instituteProfile InstituteProfile?
+  wallet          Wallet?
+  notifications   Notification[]
+}
+
+model StudentProfile {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  grade       String
+  boardId     String
+  school      String
+  xp          Int       @default(0)
+  level       Int       @default(1)
+  streak      Int       @default(0)
+  badges      String    @default("[]") // JSON
+  goals       String    @default("[]") // JSON
+  weakTopics  String    @default("[]") // JSON
+  examDate    DateTime?
+  parentEmail String?
+  leaderboardOptIn Boolean @default(false) // opt-in public leaderboard (minors off by default)
+}
+
+model ParentProfile {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  user            User    @relation(fields: [userId], references: [id])
+  emergencyName   String  @default("")
+  emergencyPhone  String  @default("")
+  consents        String  @default("{}") // JSON {location, recording, messageVisibility, whatsapp}
+  childrenEmails  String  @default("[]") // JSON of student emails linked
+}
+
+model InstituteProfile {
+  id         String  @id @default(cuid())
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id])
+  academyName String
+  city       String  @default("Chennai")
+  about      String  @default("")
+  verified   Boolean @default(false)
+}
+
+model TutorProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  headline        String   @default("")
+  bio             String   @default("")
+  yearsExperience Int      @default(0)
+  rating          Float    @default(0)
+  reviewCount     Int      @default(0)
+  sessionsDone    Int      @default(0)
+  trustScore      Int      @default(0)
+  status          String   @default("draft") // draft | in_review | needs_info | approved | rejected
+  badges          String   @default("[]") // JSON: ["ID verified", ...]
+  languages       String   @default("[]") // JSON
+  modes           String   @default("[]") // JSON: online | home | group
+  rateOnline      Int      @default(0) // paise per session
+  rateHome        Int      @default(0)
+  travelRadiusKm  Int      @default(0)
+  responseMins    Int      @default(30)
+  qualifications  String   @default("[]") // JSON [{title, issuer, year, status}]
+  experience      String   @default("[]") // JSON [{role, org, from, to, verified}]
+  availabilityJson String  @default("{}") // JSON {weekly: [{day, blocks: [{start, end}]}], exceptions: []}
+  travelBufferMin Int      @default(15)
+  verificationNote String?
+  instituteEmail  String?
+  createdAt       DateTime @default(now())
+}
+
+model TutorDocument {
+  id         String   @id @default(cuid())
+  tutorId    String
+  type       String // civil_id | degree | teaching_cert | background_check | conduct
+  name       String
+  issuer     String?
+  status     String   @default("submitted") // submitted | verified | rejected
+  uploadedAt DateTime @default(now())
+  reviewedBy String?
+  note       String?
+}
+
+// ============ CURRICULUM REGISTRY ============
+
+model CurriculumBoard {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  country     String
+  region      String // India | State boards | Africa | International
+  status      String   @default("active") // active | legacy | transitional | retired
+  verifyState String   @default("verified") // verified | partial | ingesting | coming_soon
+  lastExam    String? // e.g. "2027" for legacy tracks
+  bodies      String   @default("") // KICD / KNEC etc
+  levels      String   @default("") // PP1-Grade 12
+  sourceUrl   String?
+  verifiedAt  DateTime?
+  language    String   @default("English") // primary language of instruction for the registry
+  languages   String   @default("[]") // JSON: supported instruction languages
+  taxonomy    String   @default("{}") // JSON {top:"Chapter", mid:"Topic", leaf:"Sub-topic"} labels per profile
+  yearFormat  String   @default("split") // split "2026-27" | calendar "2026"
+  pathways    String   @default("[]") // JSON: pathway / stream options where defined
+  approvedQ   Int      @default(0) // approved question count shown on the profile card
+  grades      CurriculumGrade[]
+  subjects    CurriculumSubject[]
+}
+
+model CurriculumGrade {
+  id       String @id @default(cuid())
+  boardId  String
+  board    CurriculumBoard @relation(fields: [boardId], references: [id])
+  name     String // Grade 6 | Form 1 ...
+  subjects CurriculumSubject[]
+}
+
+model CurriculumSubject {
+  id       String @id @default(cuid())
+  boardId  String
+  gradeId  String
+  board    CurriculumBoard @relation(fields: [boardId], references: [id])
+  grade    CurriculumGrade @relation(fields: [gradeId], references: [id])
+  name     String
+  chapters CurriculumChapter[]
+}
+
+model CurriculumChapter {
+  id         String   @id @default(cuid())
+  subjectId  String
+  subject    CurriculumSubject @relation(fields: [subjectId], references: [id])
+  name       String
+  number     Int
+  status     String   @default("active") // active | legacy | retired | removed
+  source     String   @default("NCERT Textbook")
+  verifiedAt DateTime @default(now())
+  marks      Int      @default(5)
+  topics     CurriculumTopic[]
+}
+
+model CurriculumTopic {
+  id        String   @id @default(cuid())
+  chapterId String
+  chapter   CurriculumChapter @relation(fields: [chapterId], references: [id])
+  name      String
+  number    Int
+  subTopics String   @default("[]") // JSON [{ name, status? }] — sub-topics under this topic
+  marks     Int      @default(2)
+}
+
+model Offering {
+  id        String @id @default(cuid())
+  tutorId   String
+  boardId   String
+  gradeId   String
+  subjectId String
+  mode      String // online | home | group
+  price     Int // paise per session
+}
+
+// ============ BOOKINGS & SAFETY ============
+
+model Address {
+  id      String @id @default(cuid())
+  ownerId String
+  label   String
+  city    String @default("Chennai")
+  area    String
+  line1   String
+  lat     Float
+  lng     Float
+}
+
+model Booking {
+  id             String   @id @default(cuid())
+  studentId      String
+  tutorId        String
+  mode           String // online | home | group
+  subject        String
+  board          String
+  grade          String
+  title          String
+  startAt        DateTime
+  endAt          DateTime
+  state          String   @default("requested") // requested|accepted|in_progress|completed|released|cancelled|declined|no_show|disputed
+  sessionFee     Int
+  platformFee    Int
+  total          Int
+  currency       String   @default("INR")
+  addressId      String?
+  batchId        String?
+  meetUrl        String?
+  policySnapshot String   @default("{}")
+  topics         String? // JSON of covered topics after checkout
+  rating         Int?
+  reviewComment  String?
+  createdAt      DateTime @default(now())
+
+  homeSession HomeSession?
+  payment     Payment?
+}
+
+model HomeSession {
+  id              String    @id @default(cuid())
+  bookingId       String    @unique
+  booking         Booking   @relation(fields: [bookingId], references: [id])
+  stage           String    @default("scheduled") // scheduled|enroute|arrived|in_progress|done
+  otp             String    @default("0000")
+  otpAttempts     Int       @default(0)
+  otpExpiresAt    DateTime?
+  onMyWayAt       DateTime?
+  checkedInAt     DateTime?
+  checkedOutAt    DateTime?
+  sosActive       Boolean   @default(false)
+  sosAt           DateTime?
+  silentCheckStatus String? // ok | not_ok | pending
+  silentCheckAt   DateTime?
+  battery         Int       @default(88)
+  routeJson       String    @default("[]") // route polyline
+  destLat         Float
+  destLng         Float
+  destArea        String    @default("")
+  geofenceMeters  Int       @default(150)
+  summaryJson     String? // {topics, homework, notes}
+}
+
+model AlertEvent {
+  id            String   @id @default(cuid())
+  sessionId     String?
+  bookingRef    String?
+  type          String // late_start|eta_slip|geofence_exit|silent|no_checkin|overrun|sos
+  severity      String   @default("info") // info | warning | critical
+  message       String
+  acknowledged  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model LocationPing {
+  id        String   @id @default(cuid())
+  sessionId String // bookingId of the HomeSession
+  stage     String   @default("enroute") // enroute | in_progress
+  lat       Float
+  lng       Float
+  accuracy  Float    @default(15)
+  speed     Float    @default(0)
+  battery   Int      @default(88)
+  ts        DateTime @default(now())
+
+  @@index([sessionId, ts])
+}
+
+/* Safety incident workflow: open → investigating → resolved | escalated */
+model Incident {
+  id         String   @id @default(cuid())
+  sessionId  String // HomeSession.id
+  bookingRef String?
+  tutorId    String?
+  tutorName  String
+  studentName String
+  area       String   @default("")
+  status     String   @default("open") // open | investigating | resolved | escalated
+  summary    String
+  openedBy   String   @default("admin")
+  resolution String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+// ============ GROUPS ============
+
+model Batch {
+  id          String   @id @default(cuid())
+  tutorId     String
+  instituteEmail String?
+  subject     String
+  board       String
+  grade       String
+  title       String
+  schedule    String
+  dayPattern  String   @default("[]") // JSON [{day, start, end}]
+  minSeats    Int      @default(3)
+  maxSeats    Int      @default(12)
+  seatsFilled Int      @default(0)
+  pricePerSeat Int     @default(0)
+  mode        String   @default("online") // online | venue
+  venue       String?
+  status      String   @default("open") // open | confirmed | closed | cancelled (auto-refunded below minimum)
+  startDate   DateTime
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model BatchSeat {
+  id        String   @id @default(cuid())
+  batchId   String
+  studentId String
+  status    String   @default("joined") // joined | waitlist | refunded | left
+  joinedAt  DateTime @default(now())
+}
+
+// ============ MONEY ============
+
+model Payment {
+  id            String    @id @default(cuid())
+  bookingId     String?   @unique
+  booking       Booking?  @relation(fields: [bookingId], references: [id])
+  batchId       String?
+  payerId       String
+  tutorId       String?
+  purpose       String    @default("booking") // booking | batch_seat
+  method        String    @default("upi") // upi | card | wallet | applepay
+  provider      String    @default("razorpay")
+  sessionFee    Int
+  platformFee   Int
+  total         Int
+  currency      String    @default("INR")
+  status        String    @default("created") // created|held|released|refund_pending|refunded|failed
+  escrowReleasedAt DateTime?
+  createdAt     DateTime  @default(now())
+
+  invoice       Invoice?
+  ledgerEntries LedgerEntry[]
+}
+
+model LedgerEntry {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id])
+  account   String // payer_cash | escrow | platform_revenue | tutor_payable | refunds
+  debit     Int      @default(0)
+  credit    Int      @default(0)
+  memo      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  number     String   @unique
+  paymentId  String   @unique
+  payment    Payment  @relation(fields: [paymentId], references: [id])
+  payerId    String
+  amount     Int
+  currency   String   @default("INR")
+  status     String   @default("paid")
+  issuedAt   DateTime @default(now())
+}
+
+model Wallet {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+  available Int     @default(0)
+  escrow    Int     @default(0)
+  currency  String  @default("INR")
+  bankMask  String  @default("") // e.g. "SBI •••• 4821" once verified
+  bankVerified Boolean @default(false)
+}
+
+model Payout {
+  id        String    @id @default(cuid())
+  tutorId   String
+  amount    Int
+  status    String    @default("pending") // pending | processing | paid
+  bankMask  String    @default("SBI •••• 4821")
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+}
+
+// ============ TEACHING STUDIO ============
+
+model LessonPlan {
+  id             String   @id @default(cuid())
+  tutorId        String
+  title          String
+  board          String
+  grade          String
+  subject        String
+  chapterNames   String   @default("[]") // JSON
+  difficulty     String   @default("Medium")
+  periods        Int      @default(1)
+  periodMinutes  Int      @default(45)
+  slideCount     Int      @default(8)
+  contentJson    String // full 5E structure
+  provenance     String   @default("AI draft") // AI draft | AI draft + tutor edits | Structured fallback
+  version        Int      @default(1)
+  status         String   @default("draft") // draft | saved | shared
+  sharedWith     String   @default("[]") // JSON student ids
+  linkedSlotId   String?
+  sourceRefs     String   @default("[]")
+  // Post-class reflection (LearnX lesson-plan spec §6) — persisted draft until submitted for review
+  reflectionJson     String    @default("{}") // { wentWell, improve, engagement, nextSteps, revision, submittedAt }
+  reflectionStatus   String    @default("none") // none | draft | submitted
+  reflectionUpdatedAt DateTime?
+  createdAt      DateTime @default(now())
+}
+
+model QuestionPaper {
+  id           String   @id @default(cuid())
+  tutorId      String
+  lessonPlanId String?
+  title        String
+  kind         String   @default("paper") // paper | worksheet | assessment | homework | ppt
+  sourceVersion Int? // lesson-plan version this artifact was generated from
+  board        String
+  grade        String
+  subject      String
+  chapters     String   @default("[]") // JSON
+  configJson   String   @default("{}") // marks, duration, sections, counts, sets, deliveryMode, examType
+  contentJson  String   @default("{}") // sections + questions
+  answerKeyJson String  @default("{}")
+  allotmentJson String  @default("{}") // { strategy, seed, map: {studentId: set}, history: [] }
+  headerJson    String   @default("{}") // paper header customization (template, schoolName, examTitle, logoDataUrl, showStudentFields)
+  status       String   @default("draft") // draft | saved | shared
+  provenance   String   @default("AI draft")
+  sharedWith   String   @default("[]") // JSON student ids
+  sharedAt     DateTime?
+  createdAt    DateTime @default(now())
+}
+
+// ============ DIGITAL CLASSROOM ============
+
+model LiveClass {
+  id          String    @id @default(cuid())
+  tutorId     String
+  batchId     String?   // optional link to a Batch (class / section)
+  title       String
+  subject     String
+  board       String?
+  grade       String?
+  agenda      String    @default("")
+  scheduledAt DateTime
+  durationMin Int       @default(60)
+  code        String    @unique // human-friendly join code e.g. TA-7K2Q9
+  slug        String    @unique @default(cuid()) // secret part of the join link
+  hostKey     String    // presented by the host socket to claim host controls
+  waitingRoom Boolean   @default(true)
+  allowChat   Boolean   @default(true)
+  status      String    @default("scheduled") // scheduled | live | ended
+  attendanceJson String @default("{}") // { attendees: [{name, role, joinedAt, leftAt, durationMin, status}] }
+  notifiedCount  Int    @default(0)
+  lessonPlanId  String? // slides were built from this lesson plan
+  recorded     Boolean  @default(false) // consented recording happened
+  recordingSec Int      @default(0)
+  notesJson    String   @default("{}") // AI class notes {summary, actionItems, homework, status: draft|sent, absentees, sentAt}
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime?
+  endedAt     DateTime?
+}
+
+// ============ LEARNING ============
+
+model TimetableEntry {
+  id        String  @id @default(cuid())
+  ownerType String // tutor | student
+  ownerId   String
+  bookingId String?
+  batchId   String?
+  day       Int // 0=Sun
+  startMin  Int
+  endMin    Int
+  subject   String
+  mode      String
+  title     String
+  tutorName String
+  color     String  @default("#315BE5")
+}
+
+model Homework {
+  id           String   @id @default(cuid())
+  tutorId      String
+  studentId    String?
+  batchId      String?
+  title        String
+  subject      String
+  dueAt        DateTime
+  xp           Int      @default(50)
+  status       String   @default("assigned") // assigned | submitted | graded
+  score        Int?
+  feedback     String?
+  submission   String?
+  questionsJson String  @default("[]") // [{q, options, answer, explanation, marks}]
+  createdAt    DateTime @default(now())
+}
+
+model TestResult {
+  id         String   @id @default(cuid())
+  studentId  String
+  title      String
+  subject    String
+  score      Int
+  total      Int
+  xp         Int      @default(20)
+  weakTopics String   @default("[]")
+  takenAt    DateTime @default(now())
+}
+
+model PassportTopic {
+  id       String @id @default(cuid())
+  studentId String
+  subject  String
+  topic    String
+  mastery  Int // 0-100
+}
+
+model SavedTutor {
+  id        String @id @default(cuid())
+  studentId String
+  tutorId   String
+}
+
+// ============ COMMS ============
+
+model MessageThread {
+  id         String   @id @default(cuid())
+  studentId  String // student or parent user id
+  tutorId    String
+  subject    String
+  lastAt     DateTime @default(now())
+  unread     Int      @default(0)
+  blocked    Boolean  @default(false)
+  messages   Message[]
+}
+
+model MessageReport {
+  id        String   @id @default(cuid())
+  threadId  String
+  reporterId String
+  reporterName String @default("")
+  reason    String
+  status    String   @default("open") // open | reviewed
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  threadId   String
+  thread     MessageThread @relation(fields: [threadId], references: [id])
+  senderId   String
+  senderRole String
+  senderName String
+  body       String
+  createdAt  DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  body      String
+  type      String   @default("system") // booking | safety | payment | studio | system | revision
+  read      Boolean  @default(false)
+  scheduledAt DateTime? // future = spaced-revision nudge, delivered only when due
+  createdAt DateTime @default(now())
+}
+
+// ============ GOVERNANCE ============
+
+model Dispute {
+  id        String   @id @default(cuid())
+  bookingId String
+  raisedBy  String
+  reason    String
+  status    String   @default("open") // open | investigating | resolved | escalated
+  resolution String?
+  createdAt DateTime @default(now())
+}
+
+/* Weekly parent progress report — AI draft, tutor approves before the parent sees it */
+model ParentReport {
+  id         String   @id @default(cuid())
+  studentId  String
+  tutorId    String
+  weekStart  DateTime
+  contentJson String // {summary, highlights[], focus[], score, attendance}
+  status     String   @default("awaiting") // awaiting | approved
+  approvedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@unique([studentId, tutorId, weekStart])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  actorName  String
+  actorRole  String
+  action     String
+  resource   String
+  detail     String   @default("")
+  severity   String   @default("info") // info | warning | critical
+  createdAt  DateTime @default(now())
+}

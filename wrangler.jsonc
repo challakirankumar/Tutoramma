@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tutor-amma",
+  "main": "worker/index.ts",
+  "compatibility_date": "2025-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": { "enabled": true },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "tutor-amma" }
+  ],
+  // D1 database. Create it once with `npx wrangler d1 create tutor-amma-db`
+  // and paste the printed database_id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tutor-amma-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Workers AI powers the Study Buddy, Concierge, Teaching Studio & Smart Flashcards.
+  "ai": { "binding": "AI" },
+  "durable_objects": {
+    "bindings": [
+      { "name": "LIVEHUB", "class_name": "LiveHubDO" },
+      { "name": "CLASSROOMHUB", "class_name": "ClassroomHubDO" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["LiveHubDO", "ClassroomHubDO"] }
+  ],
+  "vars": {
+    "AI_TEXT_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "AI_VISION_MODEL": "@cf/meta/llama-4-scout-17b-16e-instruct"
+  }
+  // Secrets (set with `npx wrangler secret put <NAME>`):
+  //   AUTH_SECRET      — signs session cookies (required in production)
+  //   INTERNAL_SECRET  — shared secret between the LiveHub DO and internal API
+  //   DEMO_RESET_KEY   — optional; allows POST /api/demo/reset with header x-demo-reset-key
+}
