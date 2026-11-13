@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tutor-amma",
+  "name": "tutoramma",
   "main": "worker/index.ts",
   "compatibility_date": "2025-10-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -10,15 +10,14 @@
   },
   "observability": { "enabled": true },
   "services": [
-    { "binding": "WORKER_SELF_REFERENCE", "service": "tutor-amma" }
+    { "binding": "WORKER_SELF_REFERENCE", "service": "tutoramma" }
   ],
-  // D1 database. Create it once with `npx wrangler d1 create tutor-amma-db`
-  // and paste the printed database_id below.
+  // D1 database. Wrangler creates it automatically on the first deploy and
+  // links it to this Worker; tables are created on the first request.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "tutor-amma-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
       "migrations_dir": "migrations"
     }
   ],

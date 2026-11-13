@@ -1,24 +1,25 @@
 {
   "name": "tutor-amma",
   "version": "2.0.0",
-  "description": "Tutor Amma - Key to Success. Verified-tutor marketplace, AI Teaching Studio, live classrooms and safe home tuition — running on Cloudflare Workers, D1, Durable Objects and Workers AI.",
+  "description": "Tutor Amma - Key to Success. Verified-tutor marketplace, AI Teaching Studio, live classrooms and safe home tuition \u2014 running on Cloudflare Workers, D1, Durable Objects and Workers AI.",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "prisma generate && node scripts/gen-schema.mjs && opennextjs-cloudflare build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate:local": "wrangler d1 migrations apply tutor-amma-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply tutor-amma-db --remote",
-    "cf:build": "prisma generate && node scripts/gen-schema.mjs && opennextjs-cloudflare build",
-    "preview": "npm run cf:build && wrangler d1 migrations apply tutor-amma-db --local && opennextjs-cloudflare preview",
-    "deploy": "npm run cf:build && wrangler d1 migrations apply tutor-amma-db --remote && opennextjs-cloudflare deploy",
-    "upload": "npm run cf:build && opennextjs-cloudflare upload",
+    "cf:build": "npm run build",
+    "preview": "npm run build && opennextjs-cloudflare preview",
+    "deploy": "npm run build && opennextjs-cloudflare deploy",
+    "upload": "npm run build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "postinstall": "prisma generate",
-    "preview:local": "npm run cf:build && wrangler dev -c wrangler.test.jsonc",
-    "seed:snapshot": "node scripts/snapshot-seed.mjs"
+    "preview:local": "npm run build && wrangler dev -c wrangler.test.jsonc",
+    "seed:snapshot": "node scripts/snapshot-seed.mjs",
+    "build:next": "next build"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.17",

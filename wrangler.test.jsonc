@@ -2,7 +2,7 @@
 // so `wrangler dev -c wrangler.test.jsonc` runs fully offline (AI features use their fallbacks).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tutor-amma",
+  "name": "tutoramma",
   "main": "worker/index.ts",
   "compatibility_date": "2025-10-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -12,7 +12,7 @@
   },
   "observability": { "enabled": true },
   "services": [
-    { "binding": "WORKER_SELF_REFERENCE", "service": "tutor-amma" }
+    { "binding": "WORKER_SELF_REFERENCE", "service": "tutoramma" }
   ],
 
 
@@ -20,7 +20,6 @@
     {
       "binding": "DB",
       "database_name": "tutor-amma-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
       "migrations_dir": "migrations"
     }
   ],
