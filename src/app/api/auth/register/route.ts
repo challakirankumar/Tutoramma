@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { hashPassword, signToken, SESSION_COOKIE } from "@/lib/auth";
 import { hashPassword as hp } from "@/lib/auth";
+import { applyReferral } from "@/lib/referrals";
 
 // Self-registration is for Parent, Student, Tutor and Institute only. Staff roles
 // (super admin, verification officer, safety desk) are invite-only (spec §6).
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
         data: { userId: user.id, academyName: String(name).trim(), verified: false },
       });
     }
+    if (body.referralCode) await applyReferral(user.id, String(body.referralCode)).catch(() => false);
     await db.notification.create({
       data: {
         userId: user.id,

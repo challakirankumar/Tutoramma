@@ -41,6 +41,28 @@ Built to the Tutor Amma Master Architecture (edition 8) reference screens and ac
 | **Compliance & Rules** — country RulesProfiles with versions, unconfirmed values marked, compare with previous version, submit for legal approval, approval gate (required items must be set), **launch gates that open only after approval** | Super admin › Compliance & Rules | §42, Screen 52, T30 |
 | **Branded Excel export** — logo + organisation header, accent rule, styled header row, banded rows, live SUM formulas, frozen header, auto-filter, A4 fit-to-width, "Page x of y" footer, no URL or file path | Control Tower, Trust Dashboard, Classrooms, Compliance | §27, T44 |
 
+## Premium home page and second-wave modules
+
+**Home page.** It has a sticky pill navigation bar and a role-switching hero with live mock-ups for Parent, Student, Tutor and Safety desk. Below the hero:
+
+- **Ticker and coverage:** a module ticker and a "Built for India" boards strip.
+- **Product tour:** a 30-second tour built from real app screens (`public/tour`).
+- **Feature sections:** a bento grid of learning jobs, a scroll-driven "Why families switch" comparison, a dark "AI that already knows your child" band, and an institute white-label preview.
+- **Who it's for, tutors and FAQ:** a who-it's-for strip, live featured tutors with curriculum search, and an FAQ.
+- **Conversion:** a call-to-action band and a demo-request form whose requests go to Admin › Leads.
+- **Sign-in drawer and footer:** sign-in, register, demo logins for all 7 roles and class-join live in a slide-over drawer, followed by a dark footer.
+
+| Module | Where | What it does |
+|---|---|---|
+| Resource marketplace | Tutor › Resources · Student/Parent › Resource Library | Tutors publish notes, worksheets and mock papers (free or paid, optional AI draft); buyers pay from the wallet and the author keeps 85%; print-ready reader; ratings |
+| Scholarship hours | Tutor / Parent / Admin › Scholarships | Tutors pledge free hours; parents apply for a child; an admin allocates hours from a pledge transparently |
+| Refer & earn | Every role › Refer & Earn | Personal code, link and QR; ₹200 credit to both wallets when a friend signs up with `?ref=` |
+| Learning-gap check | Student › Gap Check | 12-question, seed-reproducible maths diagnostic across six topics; gaps update the learning profile and are shared with the student's tutors |
+| Weekly digest / month reel | Parent › Weekly Digest | Sessions, topics, homework, quiz average and study habits, with a next step, one-tap WhatsApp share and print |
+| Demand heatmap | Tutor › Demand Heatmap | When and what families book (IST time bands × weekdays), demand per active tutor and suggested open slots |
+| Verified teaching portfolio | Tutor › Teaching Portfolio · public `/?portfolio=<id>` | Shareable page with QR showing what was verified and when — documents and contact details stay private |
+| Leads inbox | Admin › Leads & Demos | Home-page demo requests with status pipeline, notes, call/email/WhatsApp and branded Excel export |
+
 ## Architecture
 
 ```

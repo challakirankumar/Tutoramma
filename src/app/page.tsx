@@ -9,6 +9,7 @@ import { navFor } from "@/config/nav";
    role workspaces are code-split and never bundled into the server worker. */
 const AppShell = dynamic(() => import("@/components/app/AppShell").then((m) => m.AppShell), { ssr: false });
 const Landing = dynamic(() => import("@/views/auth/Landing").then((m) => m.Landing), { ssr: false });
+const PublicPortfolio = dynamic(() => import("@/views/shared/Portfolio").then((m) => m.PublicPortfolio), { ssr: false });
 const GuestClassroom = dynamic(() => import("@/views/live/GuestClassroom").then((m) => m.GuestClassroom), { ssr: false });
 
 export default function Page() {
@@ -27,6 +28,12 @@ export default function Page() {
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
+
+    // remember a referral code (?ref=AMMA-XXXXXX) for sign-up
+    try {
+      const ref = new URLSearchParams(window.location.search).get("ref");
+      if (ref) sessionStorage.setItem("ta-ref", ref.slice(0, 20));
+    } catch {}
 
     // remember a classroom link opened while signed out, so it joins right after sign-in
     try {
@@ -109,6 +116,10 @@ export default function Page() {
       </div>
     );
   }
+
+  /* public verified teaching portfolio (?portfolio=<tutorId>) — no sign-in needed */
+  const portfolioId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("portfolio") : null;
+  if (portfolioId) return <PublicPortfolio id={portfolioId} />;
 
   /* guests with a class link → branded join screen (no account needed) */
   if (joinSlug && !user) return <GuestClassroom slug={joinSlug.trim()} />;

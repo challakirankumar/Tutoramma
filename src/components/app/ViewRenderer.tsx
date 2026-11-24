@@ -74,6 +74,14 @@ import { SAISuite } from "@/views/student/SAISuite";
 import { SAITutor } from "@/views/student/SAITutor";
 import { PPtm } from "@/views/parent/PPtm";
 import { PTrust } from "@/views/parent/PTrust";
+import { Library } from "@/views/shared/Library";
+import { Scholarships } from "@/views/shared/Scholarships";
+import { Refer } from "@/views/shared/Refer";
+import { TPortfolio } from "@/views/shared/Portfolio";
+import { TDemand } from "@/views/tutor/TDemand";
+import { PDigest } from "@/views/parent/PDigest";
+import { SDiagnostic } from "@/views/student/SDiagnostic";
+import { ALeads } from "@/views/admin/ALeads";
 
 const VIEWS: Record<string, React.ComponentType> = {
   "s-dashboard": SDashboard,
@@ -142,6 +150,20 @@ const VIEWS: Record<string, React.ComponentType> = {
   "p-trust": PTrust,
   "x-tower": ControlTower,
   "v-queue": AVerification,
+  "s-diagnostic": SDiagnostic,
+  "s-library": Library,
+  "s-refer": Refer,
+  "p-digest": PDigest,
+  "p-library": Library,
+  "p-scholarships": Scholarships,
+  "p-refer": Refer,
+  "t-resources": Library,
+  "t-demand": TDemand,
+  "t-scholarships": Scholarships,
+  "t-refer": Refer,
+  "t-portfolio": TPortfolio,
+  "a-leads": ALeads,
+  "a-scholarships": Scholarships,
 };
 
 export function ViewRenderer() {

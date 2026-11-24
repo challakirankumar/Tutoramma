@@ -277,6 +277,14 @@ function paperMathHalfYearly() {
 /* ---------- MAIN SEED ---------- */
 export async function generateDemoData() {
   /* wipe (order matters for relations) */
+  await db.resourcePurchase.deleteMany();
+  await db.resource.deleteMany();
+  await db.scholarshipApplication.deleteMany();
+  await db.scholarshipPledge.deleteMany();
+  await db.referral.deleteMany();
+  await db.referralCode.deleteMany();
+  await db.diagnosticAttempt.deleteMany();
+  await db.lead.deleteMany();
   await db.classroomMember.deleteMany();
   await db.classroom.deleteMany();
   await db.ptmBooking.deleteMany();
@@ -1142,6 +1150,7 @@ export async function generateDemoData() {
 
   await seedLearningToolkit();
   await seedEdition8();
+  await seedSecondWave();
 
   return { ok: true, seeded: true };
 }
@@ -1290,4 +1299,46 @@ async function seedEdition8() {
       createdAt: daysFromNow(-1, 18, 2),
     },
   });
+}
+
+/* ===== second wave: resources, scholarships, referrals, diagnostics, leads ===== */
+async function seedSecondWave() {
+  const res: [string, string, string, string, string, number, string, string][] = [
+    ["u-tutor-meera", "Factorisation — 20 graded practice questions", "Mathematics", "Grade 8", "worksheet", 0, "Warm-up to board-level questions with an answer key.", "# Factorisation practice\n\n## Level 1 — common factors\n1. 6x + 9\n2. 14a²b − 21ab²\n3. 5p + 10q − 15r\n\n## Level 2 — identities\n4. x² − 49\n5. 9a² − 16b²\n6. x² + 10x + 25\n\n## Level 3 — splitting the middle term\n7. x² + 7x + 12\n8. x² − 5x + 6\n9. 2x² + 7x + 3\n10. 3x² − 10x + 8\n\n---\n### Answer key\n1. 3(2x + 3) · 2. 7ab(2a − 3b) · 3. 5(p + 2q − 3r) · 4. (x + 7)(x − 7) · 5. (3a + 4b)(3a − 4b) · 6. (x + 5)² · 7. (x + 3)(x + 4) · 8. (x − 2)(x − 3) · 9. (2x + 1)(x + 3) · 10. (3x − 4)(x − 2)"],
+    ["u-tutor-meera", "Light: Reflection & Refraction — one-page revision notes", "Science", "Grade 8", "notes", 4900, "Laws, ray diagrams and common exam traps on one page.", "# Light — revision notes\n\n## Laws of reflection\n- Angle of incidence = angle of reflection.\n- Incident ray, reflected ray and normal lie in one plane.\n\n## Plane mirror image\nVirtual, erect, same size, laterally inverted, as far behind as the object is in front.\n\n## Refraction\nLight bends when its speed changes between media. Towards the normal when entering a denser medium.\n\n**Refractive index** n = c / v.\n\n## Worked example\nAngle of incidence 35° on a plane mirror → angle of reflection **35°**; angle between incident and reflected rays **70°**.\n\n## Exam traps\n- Angles are measured from the **normal**, not the mirror surface.\n- A convex mirror always gives a diminished, erect image."],
+    ["u-tutor-farah", "Letter writing — formal formats with 6 model letters", "English", "Grade 9", "notes", 0, "CBSE formats for complaint, enquiry and editor letters.", "# Formal letters\n\n## Format\nSender's address → date → receiver's address → subject → salutation → body (3 paragraphs) → complimentary close → name.\n\n## Model: letter to the editor\n**Subject:** Need for safer zebra crossings near schools\n\nSir, Through the columns of your esteemed newspaper…"],
+    ["u-tutor-meera", "Grade 8 Maths — half-yearly mock paper (80 marks)", "Mathematics", "Grade 8", "mock", 9900, "Board-pattern sections A–E with marking scheme.", "# Mock paper — Mathematics, Grade 8 (80 marks, 3 hours)\n\n## Section A — MCQ (1 × 20)\n1. The additive inverse of −7/9 is …\n\n## Section B — very short (2 × 5)\n…\n\n## Section E — case study (4 × 3)\n…\n\n---\n### Marking scheme\nStep marks are shown for every long answer."],
+  ];
+  const created: string[] = [];
+  for (const [i, [authorId, title, subject, grade, kind, price, description, content]] of res.entries()) {
+    const r = await db.resource.create({ data: { authorId, title, subject, grade, kind, price, description, content: content.replace(/\\n/g, "\n"), downloads: [42, 18, 27, 9][i], rating: [4.8, 4.9, 4.6, 4.7][i], ratings: [12, 6, 9, 3][i], createdAt: daysFromNow(-20 + i * 4, 11, 0) } });
+    created.push(r.id);
+  }
+  await db.resourcePurchase.create({ data: { resourceId: created[0], userId: "u-student-aarav", price: 0, rating: 5 } });
+
+  await db.scholarshipPledge.create({ data: { tutorId: "u-tutor-meera", hours: 20, hoursUsed: 6, subjects: "Maths, Science", note: "Weekday evenings, online or Anna Nagar", createdAt: daysFromNow(-30, 10, 0) } });
+  await db.scholarshipPledge.create({ data: { tutorId: "u-tutor-farah", hours: 10, hoursUsed: 0, subjects: "English", note: "Online only", createdAt: daysFromNow(-12, 10, 0) } });
+  await db.scholarshipApplication.create({ data: { parentId: "u-parent", childId: "u-student-ananya", subject: "Mathematics", hoursRequested: 6, reason: "Ananya missed school for six weeks after an illness and needs help catching up on fractions before her exams.", createdAt: daysFromNow(-2, 19, 0) } });
+
+  await db.referralCode.create({ data: { userId: "u-parent", code: "AMMA-PRIYA8" } });
+  await db.referralCode.create({ data: { userId: "u-tutor-meera", code: "AMMA-MEERA9" } });
+  await db.referral.create({ data: { referrerId: "u-parent", referredId: "u-st-ishita", code: "AMMA-PRIYA8", createdAt: daysFromNow(-15, 12, 0) } });
+
+  await db.diagnosticAttempt.create({
+    data: {
+      studentId: "u-student-aarav", subject: "Mathematics", grade: "Grade 8", score: 8, total: 12,
+      result: JSON.stringify({ topics: [{ topic: "Unitary method", correct: 2, total: 2 }, { topic: "Inverse proportion", correct: 1, total: 2 }, { topic: "Percentages", correct: 2, total: 2 }, { topic: "Linear equations", correct: 2, total: 2 }, { topic: "Factorisation", correct: 0, total: 2 }, { topic: "Mensuration", correct: 1, total: 2 }], gaps: ["Factorisation"], strengths: ["Unitary method", "Percentages", "Linear equations"] }),
+      sharedWith: JSON.stringify(["u-tutor-meera"]), createdAt: daysFromNow(-25, 17, 30),
+    },
+  });
+
+  const leads: [string, string, string, string, string, string, string, string, number][] = [
+    ["Sanjana Iyer", "sanjana.iyer@example.com", "98450 11223", "Bengaluru", "parent", "CBSE", "Grade 9", "Home tuition for Maths and Science, weekday evenings. Interested in live tracking.", -1],
+    ["Rahul Verma", "rahul.verma@example.com", "99001 44556", "Pune", "tutor", "ICSE", "Grade 10", "Physics teacher with 8 years — want to list group batches.", -2],
+    ["Bright Future Coaching", "admin@brightfuture.example.com", "90000 12345", "Hyderabad", "institute", "CBSE", "JEE/NEET", "12 tutors, need batches and branded receipts.", -4],
+    ["Fatima Shaikh", "fatima.s@example.com", "98200 33445", "Mumbai", "parent", "IB", "Grade 6", "Online English and Maths, two children.", -6],
+  ];
+  for (const [i, [name, email, phone, city, role, board, grade, message, d]] of leads.entries()) {
+    await db.lead.create({ data: { name, email, phone, city, role, board, grade, message, status: ["new", "contacted", "demo_booked", "won"][i], createdAt: daysFromNow(d, 10 + i, 15) } });
+  }
 }

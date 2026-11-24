@@ -1,7 +1,7 @@
 /* Tutor Amma service worker — installable app + offline shell.
    Static build assets are cache-first (they are content-hashed); pages are
    network-first with a cached fallback; API calls and realtime are never cached. */
-const VERSION = "ta-v2";
+const VERSION = "ta-v3";
 const SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/brand/tutor-amma-logo.png"];
 
 self.addEventListener("install", (e) => {

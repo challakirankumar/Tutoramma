@@ -772,3 +772,117 @@ model AiTutorSession {
 
   @@index([studentId])
 }
+
+// ============ SECOND WAVE (spec §29-§30) ============
+
+/// Demo / walkthrough requests from the public home page.
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  city      String   @default("")
+  role      String   @default("parent")
+  board     String   @default("")
+  grade     String   @default("")
+  message   String   @default("")
+  source    String   @default("home")
+  status    String   @default("new") // new | contacted | demo_booked | won | closed
+  note      String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// Resource marketplace: tutors share or sell notes, worksheets and mock papers.
+model Resource {
+  id          String   @id @default(cuid())
+  authorId    String
+  title       String
+  subject     String
+  grade       String
+  board       String   @default("CBSE")
+  kind        String   @default("notes") // notes | worksheet | mock | slides
+  description String   @default("")
+  content     String   @default("")
+  price       Int      @default(0) // paise; 0 = free
+  downloads   Int      @default(0)
+  rating      Float    @default(0)
+  ratings     Int      @default(0)
+  status      String   @default("published") // draft | published | removed
+  createdAt   DateTime @default(now())
+  purchases   ResourcePurchase[]
+
+  @@index([status, subject])
+}
+
+model ResourcePurchase {
+  id         String   @id @default(cuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId     String
+  price      Int      @default(0)
+  rating     Int?
+  createdAt  DateTime @default(now())
+
+  @@unique([resourceId, userId])
+}
+
+/// Scholarship hours: tutors pledge free hours, families apply, admin allocates.
+model ScholarshipPledge {
+  id        String   @id @default(cuid())
+  tutorId   String
+  hours     Int
+  hoursUsed Int      @default(0)
+  subjects  String   @default("")
+  note      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model ScholarshipApplication {
+  id             String   @id @default(cuid())
+  parentId       String
+  childId        String
+  subject        String
+  hoursRequested Int
+  reason         String
+  status         String   @default("pending") // pending | approved | declined
+  pledgeId       String?
+  decidedBy      String?
+  decidedAt      DateTime?
+  createdAt      DateTime @default(now())
+}
+
+/// Referral & family credits.
+model Referral {
+  id         String   @id @default(cuid())
+  referrerId String
+  referredId String   @unique
+  code       String
+  credit     Int      @default(20000) // paise to each side
+  status     String   @default("credited") // pending | credited
+  createdAt  DateTime @default(now())
+
+  @@index([referrerId])
+}
+
+/// Learning-gap diagnostic (spec §30): short adaptive quiz before the first class.
+model DiagnosticAttempt {
+  id        String   @id @default(cuid())
+  studentId String
+  subject   String
+  grade     String
+  score     Int      @default(0)
+  total     Int      @default(0)
+  result    String   @default("{}") // JSON {topics:[{topic, correct, total}], gaps:[], strengths:[]}
+  sharedWith String  @default("[]") // tutor ids
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model ReferralCode {
+  userId    String   @id
+  code      String   @unique
+  createdAt DateTime @default(now())
+}

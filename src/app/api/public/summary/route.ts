@@ -1,7 +1,14 @@
 import { db } from "@/lib/db";
+import { seedDemoData } from "@/lib/seed-runtime";
 
 /** Public landing stats + featured verified tutors (no auth). */
 export async function GET() {
+  /* a brand-new deployment shows the demo catalogue immediately (first run only) */
+  if ((await db.user.count()) === 0) {
+    try {
+      await seedDemoData();
+    } catch {}
+  }
   const [tutors, students, bookings, reviews, topTutors] = await Promise.all([
     db.tutorProfile.count({ where: { status: "approved" } }),
     db.studentProfile.count(),
