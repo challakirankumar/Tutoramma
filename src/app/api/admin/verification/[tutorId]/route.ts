@@ -8,7 +8,7 @@ const ALL_BADGES = [...BASE_BADGES, "Top rated", "Responds fast"];
 export async function POST(req: Request, { params }: { params: Promise<{ tutorId: string }> }) {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "verifier"].includes(auth.role)) return forbidden();
 
   const { tutorId } = await params;
   let body: { action?: string; note?: string };

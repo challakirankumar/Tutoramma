@@ -678,3 +678,97 @@ model StudyPlan {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ============ EDITION 8 MODULES ============
+
+/// Tutor-owned Digital Classroom (spec §10): share link, QR and 6-character join code.
+model Classroom {
+  id         String   @id @default(cuid())
+  tutorId    String
+  name       String
+  board      String   @default("CBSE")
+  grade      String
+  section    String   @default("")
+  subject    String
+  language   String   @default("English")
+  mode       String   @default("online") // online | offline | hybrid
+  visibility String   @default("link")   // private | link | public
+  joinPolicy String   @default("approval") // instant | approval | paid
+  seats      Int      @default(30)
+  waitlist   Boolean  @default(true)
+  pricePlan  String   @default("free") // free | per_class | monthly | package
+  price      Int      @default(0)      // paise
+  joinCode   String   @unique
+  shareToken String   @unique
+  schedule   String   @default("")     // human summary e.g. "Mon, Wed · 6:00 PM"
+  status     String   @default("active") // forming | active | archived
+  recording  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  members    ClassroomMember[]
+
+  @@index([tutorId])
+}
+
+model ClassroomMember {
+  id            String    @id @default(cuid())
+  classroomId   String
+  classroom     Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  studentId     String
+  status        String    @default("pending") // pending | active | waitlisted | removed
+  via           String    @default("link")    // link | code | qr | invite
+  progressShare Boolean   @default(true)
+  joinedAt      DateTime  @default(now())
+
+  @@unique([classroomId, studentId])
+}
+
+/// Parent-teacher meetings (spec §29, Screen 44): 10-minute slots.
+model PtmBooking {
+  id         String   @id @default(cuid())
+  parentId   String
+  childId    String
+  tutorId    String
+  startAt    DateTime
+  minutes    Int      @default(10)
+  mode       String   @default("online") // online | school
+  status     String   @default("booked") // booked | done | cancelled
+  brief      String   @default("")
+  notes      String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([tutorId, startAt])
+  @@index([parentId])
+}
+
+/// Country RulesProfile (spec §42, Screen 52): rules as data, gated by legal approval.
+model RulesProfile {
+  id          String    @id @default(cuid())
+  country     String
+  version     Int
+  status      String    @default("draft") // draft | in_review | approved | superseded
+  rules       String    @default("[]") // JSON [{key,label,value,confirmed,required}]
+  gates       String    @default("[]") // JSON [{key,label,state,note}]
+  notes       String    @default("")
+  submittedBy String?
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([country, version])
+}
+
+/// Live AI Tutor (Maya) transcripts — parent-visible, deletable (spec §15).
+model AiTutorSession {
+  id         String   @id @default(cuid())
+  studentId  String
+  topic      String   @default("")
+  language   String   @default("en")
+  transcript String   @default("[]") // JSON [{role, text, board?, at}]
+  understanding Int   @default(50)
+  flagged    Boolean  @default(false) // distress protocol triggered
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([studentId])
+}

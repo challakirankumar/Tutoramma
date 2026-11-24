@@ -36,6 +36,14 @@ import {
   Layers,
   Timer,
   CalendarClock,
+  School,
+  BrainCircuit,
+  Sparkle,
+  Handshake,
+  BadgeCheck,
+  Gavel,
+  RadioTower,
+  ScanSearch,
 } from "lucide-react";
 
 export interface NavItem {
@@ -53,10 +61,13 @@ export const NAV: Record<string, NavItem[]> = {
     { id: "s-find", label: "Find Tutors", icon: Search, group: "Learn" },
     { id: "s-concierge", label: "Concierge", icon: MessagesSquare, group: "Learn" },
     { id: "s-groups", label: "Group Classes", icon: Users, group: "Learn" },
+    { id: "s-classrooms", label: "My Classrooms", icon: School, group: "Learn" },
     { id: "s-live", label: "Live Classes", icon: Video, group: "Learn" },
     { id: "s-bookings", label: "My Bookings", icon: ClipboardCheck, group: "Learn" },
     { id: "s-timetable", label: "Timetable", icon: CalendarDays, group: "Learn" },
     { id: "s-homework", label: "Homework & Tests", icon: BookOpenCheck, group: "Practice" },
+    { id: "s-ai-suite", label: "AI Learning Suite", icon: Sparkle, group: "AI Tutor", badge: "New" },
+    { id: "s-ai-tutor", label: "Live AI Tutor · Maya", icon: BrainCircuit, group: "AI Tutor", badge: "AI" },
     { id: "s-assistant", label: "AI Study Buddy", icon: Bot, group: "Practice" },
     { id: "s-flashcards", label: "Smart Flashcards", icon: Layers, group: "Practice", badge: "New" },
     { id: "s-focus", label: "Focus Studio", icon: Timer, group: "Practice", badge: "New" },
@@ -77,18 +88,22 @@ export const NAV: Record<string, NavItem[]> = {
     { id: "p-wallet", label: "Wallet & Payments", icon: Wallet, group: "Money" },
     { id: "p-reports", label: "Progress Reports", icon: FileBarChart, group: "Family" },
     { id: "p-messages", label: "Messages", icon: MessageSquare, group: "Family" },
+    { id: "p-ptm", label: "Parent-Teacher Meetings", icon: Handshake, group: "Family", badge: "New" },
+    { id: "p-trust", label: "Trust Dashboard", icon: BadgeCheck, group: "Safety", badge: "New" },
   ],
   tutor: [
     { id: "t-dashboard", label: "Today", icon: LayoutDashboard, group: "Teaching" },
     { id: "t-requests", label: "Requests", icon: Hourglass, group: "Teaching" },
     { id: "t-bookings", label: "Bookings", icon: ClipboardCheck, group: "Teaching" },
     { id: "t-students", label: "My Students", icon: GraduationCap, group: "Teaching" },
+    { id: "t-classrooms", label: "Classrooms", icon: School, group: "Teaching", badge: "New" },
     { id: "t-live", label: "Live Classes", icon: Video, group: "Teaching" },
     { id: "t-timetable", label: "Timetable", icon: CalendarDays, group: "Teaching" },
     { id: "t-availability", label: "Availability", icon: Bus, group: "Teaching" },
     { id: "t-homevisits", label: "Home Visits", icon: MapPinned, group: "Safety" },
     { id: "t-studio", label: "Teaching Studio", icon: Sparkles, group: "Studio" },
     { id: "t-papers", label: "Question Papers", icon: BookOpen, group: "Studio" },
+    { id: "t-coach", label: "Teaching Coach", icon: BrainCircuit, group: "Studio", badge: "AI" },
     { id: "t-earnings", label: "Earnings", icon: Coins, group: "Money" },
     { id: "t-profile", label: "Profile & Verification", icon: UserCog, group: "Account" },
     { id: "t-messages", label: "Messages", icon: MessageSquare, group: "Account" },
@@ -111,10 +126,18 @@ export const NAV: Record<string, NavItem[]> = {
     { id: "a-disputes", label: "Disputes", icon: Scale, group: "Finance" },
     { id: "a-curriculum", label: "Curriculum Registry", icon: Library, group: "Governance" },
     { id: "a-reports", label: "Reports", icon: FileBarChart, group: "Governance" },
+    { id: "a-compliance", label: "Compliance & Rules", icon: Gavel, group: "Governance", badge: "New" },
     { id: "a-audit", label: "Audit Log", icon: ScrollText, group: "Governance" },
     { id: "a-users", label: "Users & Roles", icon: UserRound, group: "Governance" },
   ],
 };
+
+NAV.safety = [
+  { id: "x-tower", label: "Control Tower", icon: RadioTower, group: "Safety desk" },
+];
+NAV.verifier = [
+  { id: "v-queue", label: "Verification Queue", icon: ScanSearch, group: "Verification" },
+];
 
 export function navFor(role: string): NavItem[] {
   return NAV[role] ?? [];

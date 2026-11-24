@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       route: JSON.parse(hs.routeJson || "[]"),
       dest: { lat: hs.destLat, lng: hs.destLng },
       destArea: hs.destArea,
-      /* LearnX safety spec — real session window + geofence for the alert-rule engine */
+      /* Tutor Amma safety spec — real session window + geofence for the alert-rule engine */
       homeSessionId: hs.id,
       geofenceMeters: hs.geofenceMeters,
       startAt: b.startAt,

@@ -8,6 +8,8 @@ const DEMO_ACCOUNTS: Record<string, string> = {
   tutor: "tutor.demo@tutoramma.test",
   institute: "institute.demo@tutoramma.test",
   admin: "admin.demo@tutoramma.test",
+  safety: "safety.demo@tutoramma.test",
+  verifier: "verifier.demo@tutoramma.test",
 };
 
 export async function POST(req: Request) {

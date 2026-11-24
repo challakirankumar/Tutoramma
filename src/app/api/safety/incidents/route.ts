@@ -36,7 +36,7 @@ async function safetyDb(): Promise<PrismaClient> {
 export async function GET() {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "safety"].includes(auth.role)) return forbidden();
 
   const sdb = await safetyDb();
   const incidents = await sdb.incident.findMany({ orderBy: { createdAt: "desc" }, take: 30 });
@@ -92,7 +92,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "safety"].includes(auth.role)) return forbidden();
 
   const sdb = await safetyDb();
 

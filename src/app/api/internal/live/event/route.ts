@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   if (!hs) return Response.json({ ok: false, message: "session not found" }, { status: 404 });
   const booking = hs.booking;
 
-  /* LearnX: location pings are high-frequency + fire-and-forget — short-circuit
+  /* Tutor Amma: location pings are high-frequency + fire-and-forget — short-circuit
      before the user resolution below to keep them cheap (no notifications) */
   if (type === "ping") {
     const pdb = await pingDb();
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
       break;
     }
     case "alert": {
-      /* LearnX rule-engine alert — durable AlertEvent + notifications + audit */
+      /* Tutor Amma rule-engine alert — durable AlertEvent + notifications + audit */
       const severity = ["info", "warning", "critical"].includes(String(payload.severity)) ? String(payload.severity) : "warning";
       const type = String(payload.type ?? "unknown");
       const message = String(payload.message ?? "");

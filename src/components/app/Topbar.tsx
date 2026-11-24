@@ -56,7 +56,9 @@ export function Topbar() {
 
   if (!user) return null;
   const unread = notes.filter((n) => !n.read).length;
-  const roleLabel = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+  const roleLabel =
+    ({ admin: "Super admin", safety: "Safety desk", verifier: "Verification officer" } as Record<string, string>)[user.role] ??
+    user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
   const markAll = async () => {
     await fetch("/api/notifications", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ all: true }) });
@@ -107,6 +109,11 @@ export function Topbar() {
       </button>
 
       <div className="ml-auto flex items-center gap-1.5" ref={popRef}>
+        {/* date · locale (spec §3 shell rule) */}
+        <TopbarClock />
+        <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-full border text-[11.5px] font-semibold text-[#142366] bg-white" style={{ borderColor: "var(--border)" }} title="Country and language">
+          India · EN
+        </span>
         {/* notifications */}
         <div className="relative">
           <button
@@ -184,4 +191,16 @@ export function Topbar() {
       </div>
     </header>
   );
+}
+
+function TopbarClock() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
+  if (!now) return null;
+  const label = `${now.toLocaleDateString("en-IN", { weekday: "short", month: "short", day: "numeric" })} · ${now.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}`;
+  return <span className="hidden lg:inline text-[12px] font-bold text-[#142366] tabular mr-1">{label}</span>;
 }

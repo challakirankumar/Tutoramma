@@ -22,7 +22,7 @@ if (!file) throw new Error("No local D1 database found — run the local worker 
 const db = new DatabaseSync(join(dir, file), { readOnly: true });
 
 // table order = order of CREATE TABLE statements in the migration
-const sql = readFileSync("migrations/0001_init.sql", "utf8");
+const sql = readdirSync("migrations").filter((f) => f.endsWith(".sql")).sort().map((f) => readFileSync(join("migrations", f), "utf8")).join("\n");
 const order = [...sql.matchAll(/CREATE TABLE IF NOT EXISTS "([^"]+)"/g)].map((m) => m[1]);
 const ISO = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}\+00:00$/;
 

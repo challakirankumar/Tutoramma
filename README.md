@@ -23,6 +23,24 @@ Crafted with heart by **Kiran Challa**.
 
 Everything from v1 is still here: the five role workspaces (Student, Parent, Tutor, Institute, Admin), tutor discovery and verification, escrow payments, SafeHome Guardian (OTP check-in, live GPS, geofence, SOS), the live classroom (WebRTC, whiteboard, polls, quizzes, Q&A, captions, breakout rooms), the lesson plan and question paper generators, and branded PDF export.
 
+## Edition 8 modules (Master Architecture v8)
+
+Built to the Tutor Amma Master Architecture (edition 8) reference screens and acceptance tests:
+
+| Module | Where | Spec |
+|---|---|---|
+| **Module Header standard** — breadcrumb, gradient icon tile by module group, status pills, right-aligned actions, pill tabs | every new module | §17, Screen 2 |
+| **Demo access for 7 roles** — Student, Parent, Tutor, Institute, Super admin, **Verification officer**, **Safety desk**; demo ribbon; staff roles are invite-only | Sign-in page | §6, §40, T21 |
+| **Classrooms** — classroom table, New Classroom (board, grade, join policy, seats, pricing, recording consent), **share dialog with link, 6-character join code, QR (download / print), WhatsApp, SMS, email, calendar**, roster approval and waitlist, branded Excel roster | Tutor › Classrooms · Student › My Classrooms | §10, Screen 15, T10 |
+| **Teaching Coach (AI)** — learning profile (not an IQ test), 5-step strategy with "why this plan", role-play with a shy / careless / anxious simulated student, coach feedback on clarity, pacing, questioning and wait time | Tutor › Teaching Coach | §15, Screen 41 |
+| **Live AI Tutor · Maya** — talks (speech synthesis) and listens (hold to talk, barge-in), animated avatar with lip-sync, shared whiteboard, understanding meter, quick actions, six languages, **scaffolding ladder, no graded-homework answers, distress protocol (guardian + safety desk alerted, 112 / 1098 / 14416 shown)**, parent-visible and deletable transcripts | Student › Live AI Tutor | §15, Screen 40, T55–T56 |
+| **AI Learning Suite** — Doubt Scanner (photo → steps), Adaptive Practice (level rises and falls), Voice Reading Coach, Mock Test Analyzer with recovery plan, Concept Maps (curriculum registry first), Language Buddy, plus Study Planner and Flashcards | Student › AI Learning Suite | §16, Screen 42 |
+| **Parent-teacher meetings** — 10-minute slots on PTM days, online or at school, conflict-checked, AI meeting brief, calendar export | Parent › Parent-Teacher Meetings | §29, Screen 44 |
+| **Parent Trust Dashboard** — verification proofs with dates (documents stay private), employer-confirmed experience, visit history with OTP check-in / check-out logs, AI-tutor transcripts, Excel export | Parent › Trust Dashboard | §30 |
+| **Home-visit Control Tower** — KPI row, live visit list and map, alert cards with acknowledge / call / escalate, SOS escalation ladder, incidents, default alert rules, Excel log | Safety desk | §23, Screen 50, T25–T26 |
+| **Compliance & Rules** — country RulesProfiles with versions, unconfirmed values marked, compare with previous version, submit for legal approval, approval gate (required items must be set), **launch gates that open only after approval** | Super admin › Compliance & Rules | §42, Screen 52, T30 |
+| **Branded Excel export** — logo + organisation header, accent rule, styled header row, banded rows, live SUM formulas, frozen header, auto-filter, A4 fit-to-width, "Page x of y" footer, no URL or file path | Control Tower, Trust Dashboard, Classrooms, Compliance | §27, T44 |
+
 ## Architecture
 
 ```

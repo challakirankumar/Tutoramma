@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "safety"].includes(auth.role)) return forbidden();
 
   const unacknowledged = req.nextUrl.searchParams.get("unacknowledged") === "1";
   const alerts = await db.alertEvent.findMany({
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: Request) {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "safety"].includes(auth.role)) return forbidden();
 
   let body: { id?: string };
   try {

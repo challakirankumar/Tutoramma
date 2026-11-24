@@ -46,7 +46,7 @@ const TRANSITIONS: Record<string, string[]> = {
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "safety"].includes(auth.role)) return forbidden();
 
   const sdb = await safetyDb();
   const { id } = await params;

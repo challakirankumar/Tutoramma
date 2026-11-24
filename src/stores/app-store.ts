@@ -6,7 +6,7 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: "student" | "parent" | "tutor" | "institute" | "admin";
+  role: "student" | "parent" | "tutor" | "institute" | "admin" | "safety" | "verifier";
   avatarColor: string;
   isDemo: boolean;
   unreadNotifications?: number;
@@ -65,6 +65,10 @@ export function defaultViewFor(role: string): string {
       return "i-dashboard";
     case "admin":
       return "a-overview";
+    case "safety":
+      return "x-tower";
+    case "verifier":
+      return "v-queue";
     default:
       return "";
   }

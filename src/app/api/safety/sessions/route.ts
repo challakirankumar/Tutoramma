@@ -18,7 +18,7 @@ export async function GET() {
     const children = await db.studentProfile.findMany({ where: { parentEmail: auth.email } });
     const childIds = new Set(children.map((c) => c.userId));
     scoped = sessions.filter((s) => childIds.has(s.booking.studentId));
-  } else if (auth.role !== "admin") {
+  } else if (!["admin", "safety"].includes(auth.role)) {
     return forbidden();
   }
 

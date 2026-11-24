@@ -35,7 +35,7 @@ interface Featured {
   rateHome: number;
 }
 
-type Role = "student" | "parent" | "tutor" | "institute" | "admin";
+type Role = "student" | "parent" | "tutor" | "institute" | "admin" | "safety" | "verifier";
 
 export function Landing() {
   const { setUser } = useAppStore();
@@ -215,6 +215,13 @@ export function Landing() {
     { id: "tutor", label: "Tutor", desc: "Teach & earn", icon: UserCog, color: "#315BE5" },
     { id: "institute", label: "Institute", desc: "Run an academy", icon: Landmark, color: "#7C4D2A" },
     { id: "admin", label: "Admin", desc: "Operate platform", icon: ShieldCheck, color: "#14246B" },
+  ];
+
+  /* demo tiles (spec §6): every self-serve role plus the invite-only staff roles */
+  const demoCards = [
+    ...roleCards.map((r) => (r.id === "admin" ? { ...r, label: "Super admin" } : r)),
+    { id: "verifier" as Role, label: "Verifier", desc: "Review tutors", icon: SearchCheck, color: "#6D4AE0" },
+    { id: "safety" as Role, label: "Safety desk", desc: "Control Tower", icon: Radar, color: "#D64545" },
   ];
 
   const statCards = [
@@ -526,8 +533,8 @@ export function Landing() {
                   </form>
                 ) : (
                   <form onSubmit={doRegister} className="space-y-3">
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                      {roleCards.map((r) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {roleCards.filter((r) => r.id !== "admin").map((r) => (
                         <button
                           key={r.id}
                           type="button"
@@ -589,7 +596,7 @@ export function Landing() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  {roleCards.map((r) => (
+                  {demoCards.map((r) => (
                     <button key={r.id} onClick={() => doDemo(r.id)} disabled={demoBusy !== null} className="sk-btn sk-btn-ghost !justify-between group">
                       <span className="flex items-center gap-2">
                         {demoBusy === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <r.icon className="w-3.5 h-3.5" />}

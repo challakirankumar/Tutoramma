@@ -1605,7 +1605,7 @@ function LinkSlotBody({
 }
 
 /* ============================================================
- * Post-Class Reflection dialog (LearnX lesson-plan spec §6)
+ * Post-Class Reflection dialog (Tutor Amma lesson-plan spec §6)
  * Four prompts — Save as Draft persists; Submit records the revision.
  * ============================================================ */
 const REFLECTION_PROMPTS: { key: keyof Omit<ReflectionData, "status" | "updatedAt" | "revision" | "submittedAt">; label: string; placeholder: string }[] = [
@@ -1709,7 +1709,7 @@ function ReflectionDialogBody({
 /* ============================================================
  * Main view — library + wizard
  * ============================================================ */
-/** Convert-this-plan dialog — real Worksheet / Assessment / Homework / PPT artifacts (LearnX §4). */
+/** Convert-this-plan dialog — real Worksheet / Assessment / Homework / PPT artifacts (Tutor Amma spec §4). */
 function ConversionDialog({
   open,
   onOpenChange,
@@ -1727,7 +1727,7 @@ function ConversionDialog({
   const [draft, setDraft] = useState<ConversionDraft | null>(null);
   const [saveBusy, setSaveBusy] = useState(false);
 
-  /* per-kind config (defaults mirror the LearnX recording examples) */
+  /* per-kind config (defaults mirror the Tutor Amma spec examples) */
   const [qCount, setQCount] = useState(10);
   const [wsDifficulty, setWsDifficulty] = useState("Medium");
   const [diagrams, setDiagrams] = useState(true);
@@ -2304,7 +2304,7 @@ export function TStudio() {
     }
   };
 
-  /* post-class reflection (LearnX lesson-plan spec §6) */
+  /* post-class reflection (Tutor Amma lesson-plan spec §6) */
   const [reflectOpen, setReflectOpen] = useState(false);
   const [reflectBusy, setReflectBusy] = useState(false);
   const saveReflection = async (answers: Record<string, string>, submit: boolean) => {
@@ -2533,7 +2533,7 @@ export function TStudio() {
                   onChange={setDraft}
                 />
 
-                {/* Reflection & Review — post-class card (LearnX lesson-plan spec §6) */}
+                {/* Reflection & Review — post-class card (Tutor Amma lesson-plan spec §6) */}
                 {!editing && (
                   <section aria-label="Reflection and review" className="sk-card-flat p-4 sm:p-5 mt-5">
                     <div className="flex items-start justify-between gap-3 flex-wrap">

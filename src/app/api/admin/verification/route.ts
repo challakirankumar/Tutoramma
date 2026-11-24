@@ -5,7 +5,7 @@ import { getAuthUser, unauthorized, forbidden } from "@/lib/auth";
 export async function GET() {
   const auth = await getAuthUser();
   if (!auth) return unauthorized();
-  if (auth.role !== "admin") return forbidden();
+  if (!["admin", "verifier"].includes(auth.role)) return forbidden();
 
   const profiles = await db.tutorProfile.findMany({
     where: { status: { in: ["in_review", "submitted", "needs_info"] } },

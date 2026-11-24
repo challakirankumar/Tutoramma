@@ -277,6 +277,11 @@ function paperMathHalfYearly() {
 /* ---------- MAIN SEED ---------- */
 export async function generateDemoData() {
   /* wipe (order matters for relations) */
+  await db.classroomMember.deleteMany();
+  await db.classroom.deleteMany();
+  await db.ptmBooking.deleteMany();
+  await db.rulesProfile.deleteMany();
+  await db.aiTutorSession.deleteMany();
   await db.flashcard.deleteMany();
   await db.flashDeck.deleteMany();
   await db.focusSession.deleteMany();
@@ -363,6 +368,8 @@ export async function generateDemoData() {
     db.user.create({ data: { id, password: pw, country: "India", city: "Chennai", isDemo: true, avatarColor: "#315BE5", ...data } as any });
 
   await mkUser("u-admin", { name: "Arjun Mehta", email: "admin.demo@tutoramma.test", role: "admin", avatarColor: "#14246B", phone: "+91 98400 10001" });
+  await mkUser("u-safety", { name: "Nadia Shaikh", email: "safety.demo@tutoramma.test", role: "safety", avatarColor: "#D64545", phone: "+91 98400 10002" });
+  await mkUser("u-verifier", { name: "Kavya Rao", email: "verifier.demo@tutoramma.test", role: "verifier", avatarColor: "#6D4AE0", phone: "+91 98400 10003" });
   await mkUser("u-student-aarav", { name: "Aarav Menon", email: "student.demo@tutoramma.test", role: "student", avatarColor: "#F47B20", phone: "+91 95512 33440" });
   await mkUser("u-student-ananya", { name: "Ananya Menon", email: "ananya.student@tutoramma.test", role: "student", avatarColor: "#9A7EDB", phone: "+91 95512 33550" });
   await mkUser("u-parent", { name: "Priya Menon", email: "parent.demo@tutoramma.test", role: "parent", avatarColor: "#1F9D68", phone: "+91 95512 33000" });
@@ -1134,6 +1141,7 @@ export async function generateDemoData() {
   }
 
   await seedLearningToolkit();
+  await seedEdition8();
 
   return { ok: true, seeded: true };
 }
@@ -1227,5 +1235,59 @@ async function seedLearningToolkit() {
   for (const day of days.slice(0, 3)) for (const t of day.tasks) t.done = true;
   await db.studyPlan.create({
     data: { userId: SID, examName: "Half-yearly examinations", examDate, hoursPerDay: 2, plan: JSON.stringify(days), source: "smart", createdAt: start },
+  });
+}
+
+/* ===== edition 8: classrooms, PTM, country rules, AI tutor ===== */
+async function seedEdition8() {
+  const T = "u-tutor-meera";
+  const rooms = [
+    { name: "Gr 8 CBSE Maths · Evening", grade: "Grade 8", section: "A", subject: "Mathematics", language: "English", board: "CBSE", joinCode: "GR8M4K", status: "active", joinPolicy: "approval", seats: 25, schedule: "Mon, Wed · 6:00 PM",
+      members: [["u-student-aarav", "active"], ["u-st-ishita", "active"], ["u-st-rohan", "active"], ["u-st-diya", "active"], ["u-st-kabir", "active"], ["u-st-vihaan", "active"], ["u-st-zara", "active"], ["u-st-advait", "pending"], ["u-st-arjunn", "pending"]] },
+    { name: "IGCSE Physics Revision", grade: "Grade 10", section: "", subject: "Physics", language: "English", board: "IGCSE", joinCode: "PHY10R", status: "active", joinPolicy: "instant", seats: 15, schedule: "Sat · 10:00 AM",
+      members: [["u-st-sneha", "active"], ["u-st-anika", "active"], ["u-st-leila", "active"]] },
+    { name: "Gr 9 Algebra Batch", grade: "Grade 9", section: "B", subject: "Mathematics", language: "Hindi", board: "CBSE", joinCode: "ALG9BX", status: "forming", joinPolicy: "paid", seats: 10, schedule: "Tue, Thu · 5:00 PM",
+      members: [["u-st-maya", "active"], ["u-st-ishita", "waitlisted"]] },
+    { name: "Kannada Reading Circle", grade: "Grade 3", section: "", subject: "Kannada", language: "Kannada", board: "State Board", joinCode: "KAN3RC", status: "active", joinPolicy: "approval", seats: 12, schedule: "Fri · 4:30 PM",
+      members: [["u-st-rohan", "active"], ["u-st-diya", "pending"]] },
+  ];
+  for (const [i, r] of rooms.entries()) {
+    const room = await db.classroom.create({
+      data: { tutorId: T, name: r.name, grade: r.grade, section: r.section, subject: r.subject, language: r.language, board: r.board, joinCode: r.joinCode, shareToken: `demo${r.joinCode.toLowerCase()}token${i}`, status: r.status, joinPolicy: r.joinPolicy, seats: r.seats, schedule: r.schedule, createdAt: daysFromNow(-30 + i * 5, 10, 0) },
+    });
+    await db.classroomMember.createMany({ data: r.members.map(([studentId, status], k) => ({ classroomId: room.id, studentId, status, via: ["link", "code", "qr"][k % 3], joinedAt: daysFromNow(-20 + k, 18, 0) })) });
+  }
+
+  /* one PTM already booked for Aarav with Farah (next Thursday 4:40 PM IST) */
+  const now = new Date();
+  let thu = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+  while (thu.getUTCDay() !== 4) thu = new Date(thu.getTime() + 86400000);
+  await db.ptmBooking.create({
+    data: { parentId: "u-parent", childId: "u-student-aarav", tutorId: "u-tutor-farah", startAt: new Date(thu.getTime() + (16 * 60 + 40 - 330) * 60000), mode: "online", brief: "Strength: algebra (82%). Focus: geometry (41%). Suggested question: how can Aarav practise diagrams at home for 15 minutes a day?" },
+  });
+
+  /* country rules: India v2 approved, India v3 in review, UAE v1 conservative draft */
+  const { DEFAULT_RULES, DEFAULT_GATES } = await import("@/lib/rules-profile");
+  const v2 = DEFAULT_RULES.map((r) => ({ ...r, confirmed: !r.required, value: r.key === "commission" ? "15%" : r.key === "parent_cancel" ? "0% / 50% / 100%" : r.value }));
+  await db.rulesProfile.create({ data: { country: "India", version: 2, status: "approved", rules: JSON.stringify(v2), gates: JSON.stringify(DEFAULT_GATES), notes: "Online launch profile", submittedBy: "Arjun Mehta", approvedBy: "Legal · Adv. R. Iyer", approvedAt: daysFromNow(-24, 11, 0), createdAt: daysFromNow(-40, 10, 0) } });
+  await db.rulesProfile.create({ data: { country: "India", version: 3, status: "in_review", rules: JSON.stringify(DEFAULT_RULES), gates: JSON.stringify(DEFAULT_GATES), notes: "Home visits and payouts wave", submittedBy: "Arjun Mehta", createdAt: daysFromNow(-3, 10, 0) } });
+  await db.rulesProfile.create({ data: { country: "UAE", version: 1, status: "draft", rules: JSON.stringify(DEFAULT_RULES.map((r) => (r.key === "emergency" ? { ...r, value: "999" } : r.key === "gst" ? { ...r, label: "VAT on platform fee", value: "5%" } : r))), gates: JSON.stringify(DEFAULT_GATES), notes: "Conservative defaults", createdAt: daysFromNow(-9, 10, 0) } });
+
+  /* a past Maya conversation (parent-visible) */
+  const at = (h: number, m: number) => daysFromNow(-1, h, m).toISOString();
+  await db.aiTutorSession.create({
+    data: {
+      studentId: "u-student-aarav",
+      topic: "Direct and inverse proportions",
+      language: "en",
+      understanding: 72,
+      transcript: JSON.stringify([
+        { role: "student", text: "Why is 45 divided by 3 first?", at: at(18, 2) },
+        { role: "maya", text: "Good question! First we find how far the cycle goes in 1 hour. That is the speed. Then we can use it for any time. Want to try 4 hours yourself?", board: ["45 km in 3 hours", "Speed = 45 ÷ 3 = 15 km/h", "In 5 hours: 15 × 5 = 75 km"], at: at(18, 2) },
+        { role: "student", text: "60 km?", at: at(18, 3) },
+        { role: "maya", text: "Yes! 15 × 4 = 60. Try one without my help: how far in 7 hours?", board: ["15 × 4 = 60 km", "15 × 7 = ?"], at: at(18, 3) },
+      ]),
+      createdAt: daysFromNow(-1, 18, 2),
+    },
   });
 }

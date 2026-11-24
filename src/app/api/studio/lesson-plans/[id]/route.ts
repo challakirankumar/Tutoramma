@@ -129,7 +129,7 @@ export async function PUT(req: Request, { params }: Params) {
     data.status = body.status;
   }
 
-  /* Post-class reflection — Save as Draft or Submit for review (LearnX lesson-plan spec §6). */
+  /* Post-class reflection — Save as Draft or Submit for review (Tutor Amma lesson-plan spec §6). */
   if (body.reflection && typeof body.reflection === "object") {
     const r = body.reflection as Record<string, unknown>;
     const input: ReflectionInput = {

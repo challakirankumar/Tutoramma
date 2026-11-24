@@ -1,7 +1,7 @@
 /**
  * Tutor Amma — LiveHub (Cloudflare Durable Object)
  * Real-time engine for home-tuition safety: live tracking simulation,
- * OTP check-in/out, SOS, silent checks + the LearnX safety rule engine
+ * OTP check-in/out, SOS, silent checks + the Tutor Amma safety rule engine
  * (late start, ETA slip, geofence exit, silent tracker, no check-in,
  * overrun), geofence-enforced check-in, minimum-duration check-out and
  * ~10s location-ping persistence. Ephemeral state lives here; durable
@@ -56,7 +56,7 @@ interface LiveSession {
   subject: string;
   title: string;
   summary?: { topics: string[]; homework: string; notes: string };
-  /* LearnX safety spec */
+  /* Tutor Amma safety spec */
   startAt: number; /* booking.startAt (epoch ms) — real session window */
   endAt: number; /* booking.endAt (epoch ms) */
   geofenceMeters: number; /* HomeSession.geofenceMeters */
@@ -151,7 +151,7 @@ async function loadSession(sessionId: string): Promise<LiveSession | null> {
       endAt: d.endAt ? new Date(d.endAt).getTime() : 0,
       geofenceMeters: typeof d.geofenceMeters === "number" && d.geofenceMeters > 0 ? d.geofenceMeters : 150,
       homeSessionId: d.homeSessionId ?? "",
-      baselineEta: 12, /* LearnX: default baseline ETA until "On my way" captures the real one */
+      baselineEta: 12, /* Tutor Amma: default baseline ETA until "On my way" captures the real one */
       firedAlerts: new Set<string>(),
       lastPingPersistAt: 0,
       lastPingPersistPt: undefined,
@@ -204,7 +204,7 @@ function pushAlert(s: LiveSession, type: string, severity: string, message: stri
   if (s.alerts.length > 20) s.alerts.pop();
 }
 
-/* ---------- LearnX safety alert-rule engine ---------- */
+/* ---------- Tutor Amma safety alert-rule engine ---------- */
 /** Fire a rule alert at most once per session: live feed + durable persistence. */
 function fireAlert(s: LiveSession, type: string, severity: string, message: string) {
   if (s.stage === "done" || s.firedAlerts.has(type)) return;
@@ -327,7 +327,7 @@ io.on("connection", (socket) => {
     s.startedAt = Date.now();
     s.marker = interpRoute(s.route, s.progress);
     s.etaMinutes = 12;
-    s.baselineEta = 12; /* LearnX: baseline ETA for slip detection */
+    s.baselineEta = 12; /* Tutor Amma: baseline ETA for slip detection */
     s.lastPingAt = Date.now();
     s.lastPingPersistAt = 0; /* persist the first location ping immediately */
     s.lastPingPersistPt = undefined;
@@ -359,7 +359,7 @@ io.on("connection", (socket) => {
       socket.emit("checkin_result", { ok: false, reason: "INVALID_STATE", message: "Start travel before checking in." });
       return;
     }
-    /* LearnX: geofence-enforced check-in — the tutor must be within
+    /* Tutor Amma: geofence-enforced check-in — the tutor must be within
        HomeSession.geofenceMeters of the home before the OTP is considered.
        Tapping "Check in" while still en route is rejected here. */
     const distance = haversineMeters(s.marker, s.dest);
@@ -403,7 +403,7 @@ io.on("connection", (socket) => {
       socket.emit("action_result", { action: "checkout", ok: false, message: "No active session." });
       return;
     }
-    /* LearnX: minimum-duration check-out — demo policy requires 90 s of
+    /* Tutor Amma: minimum-duration check-out — demo policy requires 90 s of
        teaching time before the summary can be recorded and escrow released. */
     if (s.sessionElapsedSec < 90) {
       socket.emit("action_result", {
@@ -477,7 +477,7 @@ io.on("connection", (socket) => {
       otpExpiresAt: Date.now() + 10 * 60 * 1000,
       otpAttempts: 0,
       silentCheck: undefined,
-      /* LearnX: clear the rule engine so the demo flow can replay cleanly */
+      /* Tutor Amma: clear the rule engine so the demo flow can replay cleanly */
       baselineEta: 12,
       firedAlerts: new Set<string>(),
       lastPingAt: undefined,
@@ -500,7 +500,7 @@ setInterval(() => {
   if (io.connectionCount === 0) return; /* idle — let the Durable Object hibernate */
   const now = Date.now();
   for (const s of sessions.values()) {
-    /* LearnX alert rules run against REAL times for every loaded session */
+    /* Tutor Amma alert rules run against REAL times for every loaded session */
     evaluateSafetyRules(s, now);
 
     if (s.stage === "enroute") {

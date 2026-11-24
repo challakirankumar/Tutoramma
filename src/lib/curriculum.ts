@@ -5,7 +5,7 @@
  * region tabs, card states, lifecycle pills, per-profile year formats,
  * taxonomy labels, exam types with the Smart Preset Engine, delivery
  * modes (M1–M4), set letters and allotment strategies.
- * Follows LearnX_Curriculum_Config_Africa_Module_Spec_v6 + Master v5 §11B.
+ * Follows the Tutor Amma curriculum configuration module spec (§12).
  */
 
 /* ----------------------------- region tabs ----------------------------- */
@@ -14,7 +14,7 @@ export const REGION_TABS = ["All", "India", "State boards", "International", "Af
 export type RegionTab = (typeof REGION_TABS)[number];
 
 /* --------------------- Africa sub-regions (spec §3.3) --------------------- */
-/* Country → sub-region map transcribed from LearnX_Africa_Seed_Catalog_v6.json
+/* Country → sub-region map transcribed from the Tutor Amma seed catalogue
    (all 54 African countries). The Africa tab groups profile cards into
    collapsible sections: East, West, Southern, Central, North Africa. */
 

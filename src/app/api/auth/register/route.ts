@@ -2,7 +2,9 @@ import { db } from "@/lib/db";
 import { hashPassword, signToken, SESSION_COOKIE } from "@/lib/auth";
 import { hashPassword as hp } from "@/lib/auth";
 
-const ROLES = ["student", "parent", "tutor", "institute", "admin"];
+// Self-registration is for Parent, Student, Tutor and Institute only. Staff roles
+// (super admin, verification officer, safety desk) are invite-only (spec §6).
+const ROLES = ["student", "parent", "tutor", "institute"];
 const AVATAR_COLORS: Record<string, string> = { student: "#F47B20", parent: "#1F9D68", tutor: "#315BE5", institute: "#7C4D2A", admin: "#14246B" };
 
 export async function POST(req: Request) {

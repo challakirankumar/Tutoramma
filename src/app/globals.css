@@ -646,3 +646,14 @@ nextjs-portal {
 @media (prefers-reduced-motion: reduce) {
   .flip-card, .ta-pop-in, .ta-breathe, .ta-shimmer { transition: none !important; animation: none !important; }
 }
+
+/* edition 8 · whiteboard "writing" reveal for the Live AI Tutor */
+.ta-board-line {
+  animation: ta-write .7s cubic-bezier(.22,1,.36,1) both;
+  clip-path: inset(0 0 0 0);
+}
+@keyframes ta-write {
+  from { clip-path: inset(0 100% 0 0); opacity: .2; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .ta-board-line { animation: none; } }

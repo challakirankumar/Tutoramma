@@ -83,12 +83,18 @@ export function findChapter(subject: string, grade: string, topic: string): { ch
   } else {
     banks.push(...Object.values(MATH_TOPICS), ...Object.values(SCIENCE_TOPICS), ENGLISH_TOPICS);
   }
-  for (const b of banks) {
-    for (const [chapter, specs] of Object.entries(b)) {
-      const c = chapter.toLowerCase();
-      if (c.includes(needle) || needle.includes(c) || specs.some((sp) => sp.t.toLowerCase().includes(needle))) return { chapter, specs };
-    }
-  }
+  if (!needle) return null;
+  /* best match first: exact chapter, whole-word chapter match, then topic match */
+  const word = new RegExp(`(^|[^a-z])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`);
+  const passes: ((c: string, specs: TopicSpec[]) => boolean)[] = [
+    (c) => c === needle,
+    (c) => word.test(c) || needle.includes(c),
+    (_c, specs) => specs.some((sp) => word.test(sp.t.toLowerCase())),
+    (c, specs) => c.includes(needle) || specs.some((sp) => sp.t.toLowerCase().includes(needle)),
+  ];
+  for (const pass of passes)
+    for (const b of banks)
+      for (const [chapter, specs] of Object.entries(b)) if (pass(chapter.toLowerCase(), specs)) return { chapter, specs };
   return null;
 }
 

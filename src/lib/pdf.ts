@@ -246,7 +246,7 @@ class Pdf {
   footerPass() {
     const d = this.doc;
     const n = d.getNumberOfPages();
-    // Clean footer per the LearnX print standard: thin rule + page numbers only.
+    // Clean footer per the Tutor Amma print standard: thin rule + page numbers only.
     // No brand name, tagline, site text or dates — the user asked for the
     // "Tutor Amma — Verified Learning Platform <date>" line to be gone.
     for (let i = 1; i <= n; i++) {
@@ -892,7 +892,7 @@ export interface LessonPlanPdf {
   };
 }
 
-/* tinted 5E containers — mirrors the app's card colours (LearnX lesson-plan arch §10) */
+/* tinted 5E containers — mirrors the app's card colours (Tutor Amma lesson-plan spec §10) */
 const TINT_EXPLAIN: [number, number, number] = [234, 242, 254]; // pale blue — explanation to say aloud
 const TINT_AMBER: [number, number, number] = [253, 244, 230]; // warm amber — analogy / differentiation
 const TINT_BOARD: [number, number, number] = [252, 234, 234]; // pale red — board work / diagram

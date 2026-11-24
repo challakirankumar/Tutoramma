@@ -65,6 +65,15 @@ import { ACurriculum } from "@/views/admin/ACurriculum";
 import { AReports } from "@/views/admin/AReports";
 import { AAudit } from "@/views/admin/AAudit";
 import { AUsers } from "@/views/admin/AUsers";
+import { ACompliance } from "@/views/admin/ACompliance";
+import { ControlTower } from "@/views/safety/ControlTower";
+import { TClassrooms } from "@/views/tutor/TClassrooms";
+import { TCoach } from "@/views/tutor/TCoach";
+import { SClassrooms } from "@/views/student/SClassrooms";
+import { SAISuite } from "@/views/student/SAISuite";
+import { SAITutor } from "@/views/student/SAITutor";
+import { PPtm } from "@/views/parent/PPtm";
+import { PTrust } from "@/views/parent/PTrust";
 
 const VIEWS: Record<string, React.ComponentType> = {
   "s-dashboard": SDashboard,
@@ -123,6 +132,16 @@ const VIEWS: Record<string, React.ComponentType> = {
   "a-reports": AReports,
   "a-audit": AAudit,
   "a-users": AUsers,
+  "a-compliance": ACompliance,
+  "t-classrooms": TClassrooms,
+  "t-coach": TCoach,
+  "s-classrooms": SClassrooms,
+  "s-ai-suite": SAISuite,
+  "s-ai-tutor": SAITutor,
+  "p-ptm": PPtm,
+  "p-trust": PTrust,
+  "x-tower": ControlTower,
+  "v-queue": AVerification,
 };
 
 export function ViewRenderer() {
@@ -136,7 +155,7 @@ export function ViewRenderer() {
   if (!Active) {
     const prefix = view.split("-")[0];
     const fallbackId =
-      prefix === "s" ? "s-dashboard" : prefix === "p" ? "p-dashboard" : prefix === "t" ? "t-dashboard" : prefix === "i" ? "i-dashboard" : "a-overview";
+      prefix === "s" ? "s-dashboard" : prefix === "p" ? "p-dashboard" : prefix === "t" ? "t-dashboard" : prefix === "i" ? "i-dashboard" : prefix === "x" ? "x-tower" : prefix === "v" ? "v-queue" : "a-overview";
     const Fallback = VIEWS[fallbackId];
     return Fallback ? <Fallback /> : null;
   }

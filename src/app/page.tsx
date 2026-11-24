@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAppStore, type AuthUser } from "@/stores/app-store";
 import dynamic from "next/dynamic";
+import { navFor } from "@/config/nav";
 
 /* The app is a client-side workspace (auth boots in the browser), so the heavy
    role workspaces are code-split and never bundled into the server worker. */
@@ -27,6 +28,12 @@ export default function Page() {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
 
+    // remember a classroom link opened while signed out, so it joins right after sign-in
+    try {
+      const c = new URLSearchParams(window.location.search).get("classroom");
+      if (c) sessionStorage.setItem("ta-pending-classroom", c);
+    } catch {}
+
     // auth boot
     fetch("/api/auth/me")
       .then((r) => r.json())
@@ -35,7 +42,7 @@ export default function Page() {
           setUser(json.data as AuthUser);
           /* PWA shortcuts deep-link into a view (?view=s-focus) */
           const deepView = new URLSearchParams(window.location.search).get("view");
-          if (deepView && /^[a-z]-[a-z-]+$/.test(deepView) && deepView[0] === (json.data as AuthUser).role[0]) {
+          if (deepView && navFor((json.data as AuthUser).role).some((n) => n.id === deepView)) {
             useAppStore.getState().setView(deepView);
             try {
               window.history.replaceState(null, "", window.location.pathname);
@@ -64,6 +71,19 @@ export default function Page() {
       .catch(() => {})
       .finally(() => setBooted(true));
   }, [setBooted, setUser, setClassroom]);
+
+  /* a classroom link opened before signing in joins once a student signs in */
+  useEffect(() => {
+    if (user?.role !== "student") return;
+    try {
+      const c = sessionStorage.getItem("ta-pending-classroom");
+      if (c) {
+        sessionStorage.removeItem("ta-pending-classroom");
+        useAppStore.getState().setView("s-classrooms", { classroomCode: c, classroomAt: Date.now() });
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    } catch {}
+  }, [user]);
 
   /* guest class link (?join=slug) works without any account */
   const joinSlug = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("join") : null;
