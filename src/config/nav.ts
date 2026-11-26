@@ -1,4 +1,5 @@
 import {
+  Route,
   LayoutDashboard,
   Search,
   CalendarDays,
@@ -116,6 +117,7 @@ export const NAV: Record<string, NavItem[]> = {
     { id: "t-timetable", label: "Timetable", icon: CalendarDays, group: "Teaching" },
     { id: "t-availability", label: "Availability", icon: Bus, group: "Teaching" },
     { id: "t-homevisits", label: "Home Visits", icon: MapPinned, group: "Safety" },
+    { id: "t-route", label: "Route Planner", icon: Route, group: "Safety", badge: "New" },
     { id: "t-studio", label: "Teaching Studio", icon: Sparkles, group: "Studio" },
     { id: "t-papers", label: "Question Papers", icon: BookOpen, group: "Studio" },
     { id: "t-resources", label: "Resources", icon: LibraryBig, group: "Studio", badge: "New" },

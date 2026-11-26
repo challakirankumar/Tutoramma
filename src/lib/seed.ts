@@ -10,27 +10,30 @@ import { MATH_TOPICS, SCIENCE_TOPICS, ENGLISH_TOPICS } from "./curriculum-topics
 
 /* ---------- helpers ---------- */
 const now = () => new Date();
+/* Demo slots are India wall-clock times (IST, UTC+5:30), whatever the server's zone. */
+const IST = 330 * 60 * 1000;
+function istSlot(dayOffset: number, h: number, m: number) {
+  const d = new Date(Date.now() + IST);
+  d.setUTCDate(d.getUTCDate() + dayOffset);
+  d.setUTCHours(h, m, 0, 0);
+  return new Date(d.getTime() - IST);
+}
+const istWeekday = () => new Date(Date.now() + IST).getUTCDay();
 function atToday(h: number, m: number) {
-  const d = new Date(); d.setHours(h, m, 0, 0); return d;
+  return istSlot(0, h, m);
 }
 function daysFromNow(n: number, h: number, m: number) {
-  const d = new Date(); d.setDate(d.getDate() + n); d.setHours(h, m, 0, 0); return d;
+  return istSlot(n, h, m);
 }
 function lastWeekday(weekday: number, weeksBack = 0, h = 17, m = 0) {
-  const d = new Date();
-  let diff = (d.getDay() - weekday + 7) % 7;
+  let diff = (istWeekday() - weekday + 7) % 7;
   if (diff === 0) diff = 7;
-  d.setDate(d.getDate() - diff - weeksBack * 7);
-  d.setHours(h, m, 0, 0);
-  return d;
+  return istSlot(-diff - weeksBack * 7, h, m);
 }
 function nextWeekday(weekday: number, weeksAhead = 0, h = 17, m = 0) {
-  const d = new Date();
-  let diff = (weekday - d.getDay() + 7) % 7;
+  let diff = (weekday - istWeekday() + 7) % 7;
   if (diff === 0) diff = 7;
-  d.setDate(d.getDate() + diff + weeksAhead * 7);
-  d.setHours(h, m, 0, 0);
-  return d;
+  return istSlot(diff + weeksAhead * 7, h, m);
 }
 const F = (rupees: number) => Math.round(rupees * 100); // rupees -> paise (100 paise = Re. 1)
 
@@ -579,15 +582,36 @@ export async function generateDemoData() {
     },
   });
 
+  /* Meera's other home visits today + Thursday — feeds the Route Planner */
+  const visitRows = [
+    { id: "bk-route-1", student: "u-st-ishita", start: atToday(15, 0), subject: "Mathematics", title: "Mathematics — Rational Numbers", area: "T. Nagar, Block 2", lat: 13.0418, lng: 80.2341 },
+    { id: "bk-route-2", student: "u-st-rohan", start: atToday(16, 0), subject: "Science", title: "Science — Force & Pressure", area: "Adyar, Block 3", lat: 13.0012, lng: 80.2565 },
+    { id: "bk-route-3", student: "u-st-sneha", start: atToday(19, 30), subject: "Mathematics", title: "Mathematics — Comparing Quantities", area: "Kilpauk, Block 1", lat: 13.0827, lng: 80.242 },
+    { id: "bk-route-4", student: "u-st-diya", start: nextWeekday(4, 0, 16, 0), subject: "Science", title: "Science — Crop Production", area: "Velachery, Block 6", lat: 12.9815, lng: 80.218 },
+    { id: "bk-route-5", student: "u-st-kabir", start: nextWeekday(4, 0, 17, 15), subject: "Mathematics", title: "Mathematics — Mensuration", area: "Guindy, Block 2", lat: 13.0067, lng: 80.2206 },
+  ];
+  for (const v of visitRows) {
+    await db.booking.create({
+      data: {
+        id: v.id, studentId: v.student, tutorId: "u-tutor-meera", mode: "home", subject: v.subject, board: "CBSE", grade: "Grade 8", title: v.title,
+        startAt: v.start, endAt: new Date(v.start.getTime() + 45 * 60000), state: "accepted",
+        sessionFee: F(900), platformFee: F(135), total: F(1035),
+        policySnapshot: JSON.stringify({ freeCancelHours: 12, lateCancelSplit: "50/50", geofenceMeters: 150, otpRequired: true }),
+      },
+    });
+    await db.homeSession.create({ data: { bookingId: v.id, stage: "scheduled", otp: String(1000 + Math.floor(Math.random() * 9000)), destLat: v.lat, destLng: v.lng, destArea: v.area } });
+  }
+
   /* ===== Aarav's other bookings ===== */
   const bookingRows: { id: string; days: Date[]; state: string; mode: string; subject: string; title: string; fee: number; pay?: string; rating?: number; review?: string; addressId?: string; meetUrl?: string }[] = [
     { id: "bk-today-online", days: [atToday(17, 0)], state: "accepted", mode: "online", subject: "Mathematics", title: "Mathematics — Factorisation sprint", fee: F(750), meetUrl: "https://class.tutoramma.test/join/mt-8842", pay: "held" },
-    { id: "bk-past-1", days: [lastWeekday(1, 17, 0)], state: "released", mode: "online", subject: "Mathematics", title: "Mathematics — Algebraic Identities", fee: F(750), pay: "released", rating: 5, review: "Meera ma'am explains factorisation so clearly — Aarav finally enjoys maths!" },
-    { id: "bk-past-2", days: [lastWeekday(3, 17, 0)], state: "released", mode: "online", subject: "Mathematics", title: "Mathematics — Linear Equations", fee: F(750), pay: "released", rating: 5 },
-    { id: "bk-past-3", days: [lastWeekday(2, 18, 30)], state: "released", mode: "home", subject: "Science", title: "Science — Friction lab at home", fee: F(900), pay: "released", rating: 4, review: "Great session, arrived right on time with the OTP check-in." },
-    { id: "bk-nw-1", days: [nextWeekday(1, 17, 0)], state: "accepted", mode: "online", subject: "Mathematics", title: "Mathematics — Playing with Numbers", fee: F(750), pay: "held" },
-    { id: "bk-nw-2", days: [nextWeekday(3, 17, 0)], state: "accepted", mode: "online", subject: "Mathematics", title: "Mathematics — Introduction to Graphs", fee: F(750), pay: "held" },
-    { id: "bk-nw-3", days: [nextWeekday(2, 18, 30)], state: "accepted", mode: "home", subject: "Science", title: "Science — Sound: Frequency & Amplitude", fee: F(900), addressId: "addr-aarav", pay: "held" },
+    { id: "bk-past-1", days: [lastWeekday(1, 0, 17, 0)], state: "released", mode: "online", subject: "Mathematics", title: "Mathematics — Algebraic Identities", fee: F(750), pay: "released", rating: 5, review: "Meera ma'am explains factorisation so clearly — Aarav finally enjoys maths!" },
+    { id: "bk-past-2", days: [lastWeekday(3, 0, 17, 0)], state: "released", mode: "online", subject: "Mathematics", title: "Mathematics — Linear Equations", fee: F(750), pay: "released", rating: 5 },
+    { id: "bk-past-3", days: [lastWeekday(2, 0, 18, 30)], state: "released", mode: "home", subject: "Science", title: "Science — Friction lab at home", fee: F(900), pay: "released", rating: 4, review: "Great session, arrived right on time with the OTP check-in." },
+    { id: "bk-nw-1", days: [nextWeekday(1, 0, 17, 0)], state: "accepted", mode: "online", subject: "Mathematics", title: "Mathematics — Playing with Numbers", fee: F(750), pay: "held" },
+    { id: "bk-nw-2", days: [nextWeekday(3, 0, 17, 0)], state: "accepted", mode: "online", subject: "Mathematics", title: "Mathematics — Introduction to Graphs", fee: F(750), pay: "held" },
+    { id: "bk-tutor-cancelled", days: [nextWeekday(4, 0, 17, 0)], state: "cancelled", mode: "online", subject: "Mathematics", title: "Mathematics — Data Handling (tutor unwell)", fee: F(750) },
+    { id: "bk-nw-3", days: [nextWeekday(2, 0, 18, 30)], state: "accepted", mode: "home", subject: "Science", title: "Science — Sound: Frequency & Amplitude", fee: F(900), addressId: "addr-aarav", pay: "held" },
   ];
   for (const b of bookingRows) {
     for (let i = 0; i < b.days.length; i++) {

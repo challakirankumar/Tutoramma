@@ -93,7 +93,7 @@ export function AuthDrawer({ open, mode, role, onClose }: { open: boolean; mode:
     try {
       const u = await post("/api/auth/demo", { role: r });
       setUser(u);
-      toast({ title: `You're exploring as ${u.name.split(" ")[0]}`, description: "Demo data · simulated payments and GPS." });
+      toast({ title: `Welcome, ${u.name.split(" ")[0]}!` });
     } catch (err) {
       toast({ title: "Could not start the demo", description: (err as Error).message, variant: "destructive" });
     } finally {
@@ -208,7 +208,7 @@ export function AuthDrawer({ open, mode, role, onClose }: { open: boolean; mode:
           {tab === "demo" && (
             <div className="mt-6">
               <h2 className="font-display text-[26px] font-extrabold text-[#0F1B3D]">See every role, live.</h2>
-              <p className="text-[13px] text-[#6B7593] mt-1">One tap opens a pre-loaded demo workspace. Synthetic data, sandbox payments, simulated GPS.</p>
+              <p className="text-[13px] text-[#6B7593] mt-1">One tap opens a pre-loaded workspace for that role.</p>
               <div className="grid grid-cols-2 gap-2 mt-5">
                 {DEMOS.map((d) => (
                   <button key={d.id} onClick={() => doDemo(d.id)} disabled={busy !== null} className="group rounded-2xl border border-[#E1E7F2] p-3 flex items-center gap-2.5 hover:border-[#0F1B3D] hover:shadow-[0_6px_18px_rgba(15,27,61,.10)] transition-all text-left">

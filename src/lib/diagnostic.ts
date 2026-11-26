@@ -75,3 +75,26 @@ export function buildDiagnostic(seed: number): DiagQ[] {
   for (let round = 0; round < 2; round++) for (const g of GENS) out.push(g(r));
   return out;
 }
+
+/** n questions for one topic (used by auto-differentiated homework). */
+export function questionsForTopic(topic: string, n: number, seed: number): DiagQ[] {
+  const idx = DIAG_TOPICS.indexOf(topic);
+  const gen = GENS[idx >= 0 ? idx : 0];
+  const r = rng(seed);
+  return Array.from({ length: n }, () => gen(r));
+}
+
+/** Maps free-text weak topics ("Word problems with fractions") onto bank topics. */
+export function matchTopics(weak: string[]): string[] {
+  const out = new Set<string>();
+  const hints: [RegExp, string][] = [
+    [/unitary|rate|cost of one|per unit/i, "Unitary method"],
+    [/inverse|proportion|work|taps|time and work/i, "Inverse proportion"],
+    [/percent|discount|profit|interest|%/i, "Percentages"],
+    [/equation|linear|solve for/i, "Linear equations"],
+    [/factor|identit|algebra|polynomial/i, "Factorisation"],
+    [/mensuration|area|perimeter|volume|geometry|quadrilateral/i, "Mensuration"],
+  ];
+  for (const w of weak) for (const [re, t] of hints) if (re.test(w)) out.add(t);
+  return [...out];
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { BackupTutors } from "@/views/parent/BackupTutors";
 import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "@/stores/app-store";
 import { LoadingView, EmptyState } from "@/components/shared/Section";
@@ -19,6 +20,7 @@ import {
   Ban,
   Lock,
   Search,
+  LifeBuoy,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -83,6 +85,7 @@ const STATE_GROUPS: Record<string, string[]> = {
 };
 
 export function PBookings() {
+  const [backupFor, setBackupFor] = useState<string | null>(null);
   const { setView } = useAppStore();
   const [bookings, setBookings] = useState<BookingRow[] | null>(null);
   const [error, setError] = useState("");
@@ -164,6 +167,7 @@ export function PBookings() {
   return (
     <div className="space-y-5">
       {/* ---------- header ---------- */}
+      {backupFor && <BackupTutors bookingId={backupFor} onClose={() => setBackupFor(null)} onBooked={() => { setBackupFor(null); load(); }} />}
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-[20px] font-extrabold tracking-tight">Bookings</h1>
@@ -322,6 +326,11 @@ export function PBookings() {
                           </span>
                         )}
                         <div className="flex-1" />
+                        {["cancelled", "declined", "no_show"].includes(b.state) && !b.title?.includes("[backup:") && (
+                          <button className="sk-btn sk-btn-orange sk-btn-sm" onClick={() => setBackupFor(b.id)}>
+                            <LifeBuoy className="w-3.5 h-3.5" /> Find a backup tutor
+                          </button>
+                        )}
                         {cancellable && (
                           <button className="sk-btn sk-btn-ghost sk-btn-sm" onClick={() => setCancelTarget(b)}>
                             <XCircle className="w-3.5 h-3.5" /> Cancel

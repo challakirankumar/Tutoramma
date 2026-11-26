@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore, type AuthUser } from "@/stores/app-store";
 import dynamic from "next/dynamic";
 import { navFor } from "@/config/nav";
+import { OfflineScreen } from "@/views/shared/OfflineKits";
 
 /* The app is a client-side workspace (auth boots in the browser), so the heavy
    role workspaces are code-split and never bundled into the server worker. */
@@ -14,6 +15,7 @@ const GuestClassroom = dynamic(() => import("@/views/live/GuestClassroom").then(
 
 export default function Page() {
   const { user, booted, setUser, setBooted, setClassroom } = useAppStore();
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     // Daylight mode is the only mode — clear any stale dark preference from older sessions.
@@ -75,7 +77,10 @@ export default function Page() {
           }
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        /* no connection: offer the class kits saved on this device */
+        if (!navigator.onLine) setOffline(true);
+      })
       .finally(() => setBooted(true));
   }, [setBooted, setUser, setClassroom]);
 
@@ -124,6 +129,7 @@ export default function Page() {
   /* guests with a class link → branded join screen (no account needed) */
   if (joinSlug && !user) return <GuestClassroom slug={joinSlug.trim()} />;
 
+  if (!user && offline) return <OfflineScreen />;
   if (!user) return <Landing />;
   return <AppShell />;
 }

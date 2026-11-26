@@ -7,7 +7,9 @@ import { ModuleHeader, HeaderButton, AccentKpi } from "@/components/shared/Modul
 import { LoadingView, EmptyState } from "@/components/shared/Section";
 import { useAppStore } from "@/stores/app-store";
 import { toast } from "@/hooks/use-toast";
-import { Library as LibraryIcon, Search, Plus, Download, Star, X, Sparkles, Loader2, Printer, FileText, NotebookPen, ClipboardList, Presentation, Trash2, Wallet } from "lucide-react";
+import { saveKit, hasKit, removeKit } from "@/lib/offline-kits";
+import { OfflineKitList } from "@/views/shared/OfflineKits";
+import { Library as LibraryIcon, Search, Plus, Download, Star, X, Sparkles, Loader2, Printer, FileText, NotebookPen, ClipboardList, Presentation, Trash2, Wallet, WifiOff, CheckCircle2 } from "lucide-react";
 
 interface Res {
   id: string;
@@ -59,6 +61,7 @@ export function Library() {
   const [creating, setCreating] = useState(false);
 
   const load = useCallback(() => {
+    if (tab === "offline") return;
     setList(null);
     const p = new URLSearchParams({ q, subject, grade, ...(tab === "mine" ? { mine: "1" } : {}) });
     api<Res[]>(`/api/resources?${p}`).then(setList).catch(() => setList([]));
@@ -92,7 +95,7 @@ export function Library() {
         subtitle={isAuthor ? "Share or sell notes, worksheets and mock papers. You keep 85% of every sale." : "Notes, worksheets and mock papers from verified tutors — free or for a small price."}
         pills={[{ label: "Verified authors", tone: "verified" }]}
         actions={isAuthor ? <HeaderButton variant="primary" onClick={() => setCreating(true)}><Plus className="w-3.5 h-3.5" /> Publish resource</HeaderButton> : undefined}
-        tabs={isAuthor ? [{ id: "mine", label: "My resources" }, { id: "browse", label: "Marketplace" }] : [{ id: "browse", label: "Browse" }]}
+        tabs={[...(isAuthor ? [{ id: "mine", label: "My resources" }, { id: "browse", label: "Marketplace" }] : [{ id: "browse", label: "Browse" }]), { id: "offline", label: "Offline kits" }]}
         activeTab={tab}
         onTab={setTab}
       />
@@ -116,7 +119,9 @@ export function Library() {
         </div>
       )}
 
-      {!list ? (
+      {tab === "offline" ? (
+        <OfflineKitList />
+      ) : !list ? (
         <LoadingView label="Loading resources…" />
       ) : list.length === 0 ? (
         <div className="sk-card p-4"><EmptyState icon={LibraryIcon} title={tab === "mine" ? "Nothing published yet" : "No resources match"} sub={tab === "mine" ? "Publish your first worksheet — AI can draft it for you." : "Try another subject or grade."} action={tab === "mine" ? <button className="sk-btn sk-btn-primary" onClick={() => setCreating(true)}><Plus className="w-4 h-4" /> Publish resource</button> : undefined} /></div>
@@ -176,6 +181,19 @@ function Reader({ id, onClose, canRate }: { id: string; onClose: () => void; can
     w.document.write(`<!doctype html><html><head><title>${r.title}</title><style>@page{size:A4;margin:0}body{font-family:system-ui,sans-serif;color:#142366;margin:0}.sheet{padding:16mm 16mm 18mm}header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #F26B1D;padding-bottom:8px;margin-bottom:14px}header b{font-size:16pt}header span{font-size:9pt;color:#57627F;text-align:right}h1,h2,h3{color:#142366}p,li{font-size:11pt;line-height:1.55;color:#24304f}.foot{position:fixed;bottom:8mm;left:16mm;right:16mm;font-size:8pt;color:#8A93AB;display:flex;justify-content:space-between}</style></head><body><div class="sheet"><header><b>Tutor <span style="color:#F26B1D;font-size:16pt">Amma</span></b><span>${r.title}<br/>${r.subject} · ${r.grade} · by ${r.authorName}</span></header>${body}</div><div class="foot"><span>Tutor Amma resource library</span><span>${r.board}</span></div><script>onload=()=>{print();setTimeout(()=>close(),300)}</script></body></html>`);
     w.document.close();
   };
+  const [saved, setSaved] = useState(() => hasKit(id));
+  const toggleOffline = () => {
+    if (!r) return;
+    if (saved) {
+      removeKit(id);
+      setSaved(false);
+      return toast({ title: "Removed from offline kits" });
+    }
+    if (saveKit({ id, title: r.title, subject: r.subject, grade: r.grade, board: r.board, author: r.authorName, content: r.content })) {
+      setSaved(true);
+      toast({ title: "Saved offline", description: "Readable on this device with no internet — Library › Offline kits." });
+    } else toast({ title: "Not enough space on this device", variant: "destructive" });
+  };
   const rate = async (n: number) => {
     try {
       await api(`/api/resources/${id}`, { method: "POST", body: JSON.stringify({ action: "rate", rating: n }) });
@@ -193,6 +211,7 @@ function Reader({ id, onClose, canRate }: { id: string; onClose: () => void; can
             {r && <div className="text-[12px] text-muted-foreground">{r.subject} · {r.grade} · by {r.authorName}</div>}
           </div>
           {canRate && r && <div className="flex">{[1, 2, 3, 4, 5].map((n) => <button key={n} onClick={() => rate(n)} aria-label={`Rate ${n}`}><Star className="w-4 h-4 text-[#E8A20C] hover:fill-[#E8A20C]" /></button>)}</div>}
+          <button className="sk-btn sk-btn-sm sk-btn-ghost" onClick={toggleOffline} disabled={!r}>{saved ? <><CheckCircle2 className="w-3.5 h-3.5 text-[#1F9D6B]" /> Offline</> : <><WifiOff className="w-3.5 h-3.5" /> Save offline</>}</button>
           <button className="sk-btn sk-btn-sm sk-btn-ghost" onClick={print} disabled={!r}><Printer className="w-3.5 h-3.5" /> Print</button>
           <button className="p-1.5 rounded-lg hover:bg-[#F3F6FB]" onClick={onClose} aria-label="Close"><X className="w-4 h-4" /></button>
         </div>

@@ -299,6 +299,30 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         }
       }
 
+      /* 3b. Smart Class Recap reaches parents too (spec §29): every notified
+       * student's guardian gets the approved recap — present or absent. */
+      const recapKids = [...attendeeStudents, ...absentStudents];
+      if (recapKids.length) {
+        const kidProfiles = await db.studentProfile.findMany({ where: { userId: { in: recapKids.map((k) => k.id) } }, select: { userId: true, parentEmail: true } });
+        const parentEmails = [...new Set(kidProfiles.map((k) => k.parentEmail).filter(Boolean) as string[])];
+        const parents = await db.user.findMany({ where: { email: { in: parentEmails }, role: "parent" }, select: { id: true, email: true } });
+        for (const kp of kidProfiles) {
+          const parent = parents.find((p) => p.email === kp.parentEmail);
+          if (!parent) continue;
+          const kid = recapKids.find((k) => k.id === kp.userId)!;
+          const present = attendeeStudents.some((a) => a.id === kid.id);
+          await db.notification.create({
+            data: {
+              userId: parent.id,
+              title: `Class recap · ${kid.name.split(" ")[0]} · ${c.title}`,
+              body: `${present ? "Attended." : "Missed this class — a catch-up pack was sent."} ${notes.summary} Homework: ${notes.homework}`,
+              type: "system",
+            },
+          });
+          notified += 1;
+        }
+      }
+
       /* 4. attendees earn +15 XP "Class participation" */
       for (const s of attendeeStudents) {
         const profile = await db.studentProfile.findUnique({ where: { userId: s.id }, select: { xp: true } });

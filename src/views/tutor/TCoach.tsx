@@ -140,7 +140,7 @@ export function TCoach() {
         subtitle="Understand each student, get a teaching plan that fits them, and rehearse with a simulated learner."
         pills={[{ label: "AI", tone: "ai" }, { label: "Learning profile, not an IQ test", tone: "verified" }]}
         actions={
-          students.length > 0 ? (
+          students.length > 0 && tab !== "differentiate" ? (
             <select className="sk-input !w-auto !py-2 !rounded-full" value={sid} onChange={(e) => setSid(e.target.value)} aria-label="Choose student">
               {students.map((s) => (
                 <option key={s.id} value={s.id}>{s.name} · {s.grade}</option>
@@ -151,12 +151,15 @@ export function TCoach() {
         tabs={[
           { id: "profile", label: "Profile & strategy" },
           { id: "practice", label: "Role-play practice" },
+          { id: "differentiate", label: "Differentiated homework" },
         ]}
         activeTab={tab}
         onTab={setTab}
       />
 
-      {students.length === 0 ? (
+      {tab === "differentiate" ? (
+        <Differentiate />
+      ) : students.length === 0 ? (
         <div className="sk-card p-4"><EmptyState icon={Users} title="No linked students yet" sub="Students appear here once they book you or join one of your classrooms." /></div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -312,6 +315,75 @@ function RolePlay({ topic }: { topic: string }) {
         ) : (
           <p className="text-[12px] text-muted-foreground">Reply to the student — feedback on clarity, pacing, questioning and wait time appears after each turn.</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- auto-differentiated homework (spec §29) ---------------- */
+interface DPlan { studentId: string; name: string; topics: string[]; source: string; count: number; sample: string }
+function Differentiate() {
+  const { setView } = useAppStore();
+  const [plans, setPlans] = useState<DPlan[] | null>(null);
+  const [skip, setSkip] = useState<Set<string>>(new Set());
+  const [perTopic, setPerTopic] = useState(3);
+  const [dueDays, setDueDays] = useState(5);
+  const [busy, setBusy] = useState(false);
+  const preview = useCallback(() => {
+    setPlans(null);
+    fetch("/api/coach/differentiate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ perTopic }) })
+      .then((r) => r.json()).then((j) => setPlans(j.data?.plans ?? [])).catch(() => setPlans([]));
+  }, [perTopic]);
+  useEffect(preview, [preview]);
+  const assign = async () => {
+    if (!plans) return;
+    setBusy(true);
+    const ids = plans.filter((p) => !skip.has(p.studentId)).map((p) => p.studentId);
+    const r = await fetch("/api/coach/differentiate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ assign: true, studentIds: ids, perTopic, dueDays }) });
+    setBusy(false);
+    if (r.ok) {
+      toast({ title: `Assigned to ${ids.length} student${ids.length === 1 ? "" : "s"}`, description: "Each set targets that student's own gaps and is auto-graded." });
+      setView("t-students");
+    } else toast({ title: "Couldn't assign", variant: "destructive" });
+  };
+  if (!plans) return <LoadingView label="Matching practice to each student's gaps…" />;
+  if (!plans.length) return <div className="sk-card p-4"><EmptyState icon={Users} title="No linked students yet" sub="Students appear here once they book you." /></div>;
+  const chosen = plans.length - plans.filter((p) => skip.has(p.studentId)).length;
+  return (
+    <div className="sk-card p-5">
+      <div className="flex flex-wrap items-end gap-3 justify-between">
+        <div>
+          <div className="text-[15px] font-extrabold text-[#142366]">One assignment, a different set for every student</div>
+          <p className="text-[12px] text-muted-foreground mt-0.5">Built from each student's latest Gap Check, quiz weak topics and learning profile. Answers are auto-graded.</p>
+        </div>
+        <div className="flex gap-2 items-center text-[12px]">
+          <label className="flex items-center gap-1.5">Questions per topic
+            <select className="sk-input !w-auto !py-1.5" value={perTopic} onChange={(e) => setPerTopic(Number(e.target.value))}>{[2, 3, 4].map((n) => <option key={n}>{n}</option>)}</select>
+          </label>
+          <label className="flex items-center gap-1.5">Due in
+            <select className="sk-input !w-auto !py-1.5" value={dueDays} onChange={(e) => setDueDays(Number(e.target.value))}>{[2, 3, 5, 7].map((n) => <option key={n} value={n}>{n} days</option>)}</select>
+          </label>
+          <button className="sk-btn sk-btn-sm sk-btn-ghost" onClick={preview}><RefreshCw className="w-3.5 h-3.5" /> Shuffle</button>
+        </div>
+      </div>
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">
+        {plans.map((p) => {
+          const off = skip.has(p.studentId);
+          return (
+            <div key={p.studentId} className={clsx("rounded-2xl border p-4 transition", off ? "opacity-50 bg-[#F7F8FB]" : "bg-white")} style={{ borderColor: "var(--border)" }}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-bold text-[13.5px]">{p.name}</div>
+                <input type="checkbox" className="accent-[#142366] mt-1" checked={!off} onChange={() => setSkip((x) => { const n = new Set(x); if (n.has(p.studentId)) n.delete(p.studentId); else n.add(p.studentId); return n; })} aria-label={`Include ${p.name}`} />
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">{p.topics.map((t) => <span key={t} className="px-2 py-[2px] rounded-full bg-[#EFEAFD] text-[#6D4AE0] text-[11px] font-bold">{t}</span>)}</div>
+              <div className="text-[11px] text-muted-foreground mt-2">{p.count} questions · from {p.source}</div>
+              {p.sample && <div className="text-[11.5px] mt-2 italic line-clamp-2">“{p.sample}”</div>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-end mt-4">
+        <button className="sk-btn sk-btn-primary" disabled={busy || !chosen} onClick={assign}><Sparkles className="w-4 h-4" /> {busy ? "Assigning…" : `Assign to ${chosen} student${chosen === 1 ? "" : "s"}`}</button>
       </div>
     </div>
   );

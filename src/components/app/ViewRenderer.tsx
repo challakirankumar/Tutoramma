@@ -79,6 +79,7 @@ import { Scholarships } from "@/views/shared/Scholarships";
 import { Refer } from "@/views/shared/Refer";
 import { TPortfolio } from "@/views/shared/Portfolio";
 import { TDemand } from "@/views/tutor/TDemand";
+import { TRoute } from "@/views/tutor/TRoute";
 import { PDigest } from "@/views/parent/PDigest";
 import { SDiagnostic } from "@/views/student/SDiagnostic";
 import { ALeads } from "@/views/admin/ALeads";
@@ -159,6 +160,7 @@ const VIEWS: Record<string, React.ComponentType> = {
   "p-refer": Refer,
   "t-resources": Library,
   "t-demand": TDemand,
+  "t-route": TRoute,
   "t-scholarships": Scholarships,
   "t-refer": Refer,
   "t-portfolio": TPortfolio,

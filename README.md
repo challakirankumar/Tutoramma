@@ -63,6 +63,17 @@ Built to the Tutor Amma Master Architecture (edition 8) reference screens and ac
 | Verified teaching portfolio | Tutor › Teaching Portfolio · public `/?portfolio=<id>` | Shareable page with QR showing what was verified and when — documents and contact details stay private |
 | Leads inbox | Admin › Leads & Demos | Home-page demo requests with status pipeline, notes, call/email/WhatsApp and branded Excel export |
 
+## Third-wave signature features
+
+| Feature | Where | What it does |
+|---|---|---|
+| Smart class recap for parents | Tutor › Live Classes › class notes › Send | The approved recap goes to each student's parent as well as the student (present or absent) |
+| Backup tutor guarantee | Parent › Bookings › "Find a backup tutor" | When a tutor cancels or misses a session, offers verified, free tutors in the same subject at the same slot and original price; one backup per lost session |
+| Route planner | Tutor › Route Planner | The day's home visits as a route: distance, drive time, leave-by times, tight-buffer warnings, fuel estimate and advisory swaps that save kilometres (families' slots never move automatically) |
+| Group auto-fill | Tutor › Classrooms › roster | Suggests matching students (grade, board, subject need) with shortened names; invitations go to student and parent with the join code — the tutor still approves every joiner |
+| Differentiated homework | Tutor › Teaching Coach › Differentiated homework | One click gives every linked student their own auto-graded practice set aimed at their own gaps (Gap Check, quiz weak topics, profile) |
+| Offline class kits | Library › "Save offline" · Library › Offline kits | Saves resources on the device; if the app opens with no connection, a lightweight offline screen lists saved kits for reading |
+
 ## Architecture
 
 ```

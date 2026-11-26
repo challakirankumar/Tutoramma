@@ -426,7 +426,56 @@ function RosterDrawer({ room, onClose, onShare }: { room: Room; onClose: () => v
             ) : null
           )
         )}
+        {room.status !== "archived" && <AutoFill roomId={room.id} />}
       </aside>
+    </div>
+  );
+}
+
+/* ---------------- group auto-fill (spec §24) ---------------- */
+function AutoFill({ roomId }: { roomId: string }) {
+  const [d, setD] = useState<{ seatsLeft: number; suggestions: { studentId: string; label: string; reasons: string[]; score: number }[] } | null>(null);
+  const [pick, setPick] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(() => {
+    api<NonNullable<typeof d>>(`/api/classrooms/${roomId}/autofill`).then((x) => { setD(x); setPick(new Set(x.suggestions.slice(0, Math.min(3, x.seatsLeft)).map((s) => s.studentId))); }).catch(() => {});
+  }, [roomId]);
+  useEffect(load, [load]);
+  if (!d || !d.suggestions.length) return null;
+  const toggle = (id: string) => setPick((p) => { const n = new Set(p); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const send = async () => {
+    setBusy(true);
+    try {
+      const r = await api<{ sent: number }>(`/api/classrooms/${roomId}/autofill`, { method: "POST", body: JSON.stringify({ studentIds: [...pick] }) });
+      toast({ title: `Invited ${r.sent} famil${r.sent === 1 ? "y" : "ies"}`, description: "They get the join code — you still approve each joiner." });
+      load();
+    } catch (e) {
+      toast({ title: "Couldn't send invitations", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mt-6 rounded-2xl border border-[#DCD2FB] bg-[#F7F4FF] p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-[13px] font-extrabold text-[#6D4AE0]">Group Auto-Fill</div>
+        <span className="text-[11px] font-bold text-[#6D4AE0]">{d.seatsLeft} seat{d.seatsLeft === 1 ? "" : "s"} left</span>
+      </div>
+      <p className="text-[11.5px] text-muted-foreground mt-0.5">Students on Tutor Amma who match this class. Names are shortened until a family accepts.</p>
+      <div className="space-y-1.5 mt-3">
+        {d.suggestions.map((s) => (
+          <label key={s.studentId} className="flex items-start gap-2.5 bg-white rounded-xl px-3 py-2 cursor-pointer border border-transparent has-[:checked]:border-[#B9A6F5]">
+            <input type="checkbox" className="mt-1 accent-[#6D4AE0]" checked={pick.has(s.studentId)} onChange={() => toggle(s.studentId)} />
+            <div className="min-w-0">
+              <div className="text-[12.5px] font-bold">{s.label}</div>
+              <div className="text-[11px] text-muted-foreground">{s.reasons.join(" · ")}</div>
+            </div>
+          </label>
+        ))}
+      </div>
+      <button className="sk-btn sk-btn-sm sk-btn-primary mt-3 w-full" disabled={!pick.size || busy} onClick={send}>
+        <Mail className="w-3.5 h-3.5" /> {busy ? "Sending…" : `Invite ${pick.size} famil${pick.size === 1 ? "y" : "ies"}`}
+      </button>
     </div>
   );
 }
